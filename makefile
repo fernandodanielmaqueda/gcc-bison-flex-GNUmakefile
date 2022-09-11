@@ -7,7 +7,7 @@
 # YACC-LEX-makefile: Este makefile sirve para compilar, ejecutar y depurar proyectos de LEX (archivos *.l) y proyectos de YACC (archivos *.y) + LEX (archivos *.l) (así como proyectos que utilicen programas compatibles con LEX y YACC, como ser flex y bison)
 # Requiere GNU Make desde su versión 3.81 en adelante (u otros programas compatibles)
 # Asímismo necesita ser ejecutado en una shell compatible con sh (sh, bash, etc.) y poder utilizar los siguientes comandos: command printf echo cd mkdir rm rmdir true sed grep dirname sort uniq
-# Adicionalmente para poder abrir una nueva shell, para Windows utiliza el comando start, y para el resto de los sistemas operativos utiliza el comando tmux
+# Adicionalmente para poder abrir una nueva ventana, para Windows utiliza el comando start, y para el resto de los sistemas operativos utiliza el comando tmux
 
 # Para determinar el programa utilizado como la shell
 SHELL:=/bin/sh
