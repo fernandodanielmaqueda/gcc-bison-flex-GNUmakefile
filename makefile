@@ -67,10 +67,10 @@ CFLAGS+= -g
 YFLAGS+= -t
 # Agregar acá los flags que se le quieran pasar a LEX cuando se active el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+= -d
-# Cuando se active el modo debug (DEBUG=1), sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
+# Cuando se active el modo debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS+= -DYYDEBUG=1
 else
-# Cuando se active el modo debug (DEBUG=1), sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
+# Cuando se desactive el modo debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 C_YOBJFLAGS+= -DYYDEBUG=0
 endif
 
