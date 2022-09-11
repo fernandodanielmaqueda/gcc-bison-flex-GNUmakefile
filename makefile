@@ -58,7 +58,7 @@ endif
 
 # Acá se configura el modo debug de CC, YACC y LEX según se encuentre activado o desactivado
 # Por defecto el modo debug está desactivado: en caso de que no se le defina un valor a DEBUG al comando de make, es como si se le agregara DEBUG=0
-# Si se quiere activar el modo debug de CC, YACC y LEX, se debe agregar DEBUG=1 al comando de make. Por ejemplo: <make DEBUG=1>, <make all DEBUG=1>, <make clean DEBUG=1> y <make clean all DEBUG=1>
+# Si se quiere activar el modo debug de CC, YACC y LEX, se debe agregar DEBUG=1 al comando de make. Por ejemplo: <make DEBUG=1>, <make all DEBUG=1> y <make clean all DEBUG=1>
 DEBUG?=0
 ifneq ($(DEBUG),0)
 # Agregar acá los flags que se le quieran pasar a CC cuando se active el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs,COFF, XCOFF, o DWARF) para que pueda depurarse)
