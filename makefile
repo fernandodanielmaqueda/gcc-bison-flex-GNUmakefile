@@ -207,13 +207,13 @@ all: $(ESC_BINS)
 .SECONDARY: $(ESC_BINS) $(ESC_OBJDIR) $(ESC_BINDIR) $(ESC_COBJS) $(ESC_YOBJS) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(shell echo "$(subst ",\",$(YOBJS))" | sed 's|"$(OBJDIR)/\([^"]*\)\.tab\.o"|"$(OBJDIR)/\1.tab.c"|g' ;)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(shell echo "$(subst ",\",$(YOBJS))" | sed 's|"$(OBJDIR)/\([^"]*\)\.tab\.o"|"$(OBJDIR)/\1.tab.h"|g' ;)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(shell echo "$(subst ",\",$(YOBJS))" | sed 's|"$(OBJDIR)/\([^"]*\)\.tab\.o"|"$(OBJDIR)/\1.output"|g' ;)))) $(ESC_LOBJS) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(shell echo "$(subst ",\",$(LOBJS))" | sed 's|"$(OBJDIR)/\([^"]*\)\.lex\.yy\.o"|"$(OBJDIR)/\1.lex.yy.c"|g' ;))))
 endif
 
-# Para ejecutar los binarios que se buildean sucesivamente desde la misma shell
+# Para ejecutar los binarios que se buildean sucesivamente desde la misma ventana
 run:
 	@echo ""
-	@echo "=================[ Ejecutar sucesivamente en esta shell el/los binario/s: $(subst ",\",$(BINS)) ]================="
+	@echo "=================[ Ejecutar sucesivamente en esta ventana el/los binario/s: $(subst ",\",$(BINS)) ]================="
 	@for BIN in $(shell echo "$(subst ",\",$(BINS))" | sed 's|"$(BINDIR)/\([^"]*\)\.$(BINSEXT)"|"\1.$(BINSEXT)"|g' ;) ; do \
 		echo "" ; \
-		echo "<<< Ejecutando en esta shell el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
+		echo "<<< Ejecutando en esta ventana el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
 		if [ -f "$(BINDIR)/$$BIN" ]; then \
 			echo "cd \"$(BINDIR)\"" ; cd "$(BINDIR)" ; \
 			echo "\"./$$BIN\"" ; "./$$BIN" ; \
@@ -300,13 +300,13 @@ clean:
 	@echo ""
 	@echo "=================[ Finalizado ]============="
 
-# Para depurar los binarios que se buildean sucesivamente desde la misma shell
+# Para depurar los binarios que se buildean sucesivamente desde la misma ventana
 cdebug-run:
 	@echo ""
-	@echo "=================[ Depurar sucesivamente en esta shell el/los binario/s: $(subst ",\",$(BINS)) ]================="
+	@echo "=================[ Depurar sucesivamente en esta ventana el/los binario/s: $(subst ",\",$(BINS)) ]================="
 	@for BIN in $(shell echo "$(subst ",\",$(BINS))" | sed 's|"$(BINDIR)/\([^"]*\)\.$(BINSEXT)"|"\1.$(BINSEXT)"|g' ;) ; do \
 		echo "" ; \
-		echo "<<< $(CDB): Depurando en esta shell el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
+		echo "<<< $(CDB): Depurando en esta ventana el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
 		if [ -f "$(BINDIR)/$$BIN" ]; then \
 			$(call existe_comando,$(CDB)) ; \
 			echo "** Version instalada de $(CDB): $$($(CDB) --version | sed -n 1p) **" ; \
