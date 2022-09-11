@@ -107,7 +107,7 @@ C_LOBJFLAGS+=
 # Definimos en una variable la configuración para poder mostrarla en donde sea relevante para el usuario
 configuracion:=DEBUG: $(if $(filter-out 0,$(DEBUG)),Si,No) | WARNINGS: $(if $(filter-out 0,$(WARNINGS)),Si,No)
 
-# Define una variable que contiene un solo espacio para luego utilizarla para sustituir cada con secuencias de escape cada uno de los espacios
+# Define una variable que contiene un solo espacio para luego utilizarla para sustituir con secuencias de escape cada uno de los espacios
 espacio:=$(subst ",," ")
 
 # Define una variable que contiene un signo numeral para poder ser utilizado en referencias macro y en invocaciones de funciones
