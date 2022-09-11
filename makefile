@@ -168,7 +168,7 @@ BINS:=$(shell echo "$(subst ",\",$(LSRCS))" | sed 's|"$(SRCDIR)/\([^"]*\)\.l"|"$
 # Alerta si no hay ningun binario a generar definido en la variable BINS del makefile
 $(if $(BINS),,$(error ERROR: no se ha encontrado ningun archivo de $(LEX) (*.l) en el directorio de archivos fuente definido en la variable SRCDIR del makefile: "$(SRCDIR)"))
 
-# Produce el nombre de todos los archivos que se generan al compilar, a excepción de los archivos objeto de acuerdo con los archivos fuente de C (COBJS)
+# Produce el nombre de todos los archivos que se generan al compilar (tanto archivos secundarios como binarios), a excepción de los archivos objeto de acuerdo con los archivos fuente de C (COBJS)
 ALL:=$(shell for BIN in $(shell echo "$(subst ",\",$(BINS))" | sed 's|"$(BINDIR)/\([^"]*\)\.$(BINSEXT)"|"\1"|g' ;) ; do if [ -f "$(SRCDIR)/$$BIN.y" ]; then echo "\"$(OBJDIR)/$$BIN.tab.c\"" ; echo "\"$(OBJDIR)/$$BIN.tab.h\"" ; echo "\"$(OBJDIR)/$$BIN.output\"" ; echo "\"$(OBJDIR)/$$BIN.tab.o\"" ; fi ; echo "\"$(OBJDIR)/$$BIN.lex.yy.c\"" ; echo "\"$(OBJDIR)/$$BIN.lex.yy.o\"" ; echo "\"$(BINDIR)/$$BIN.$(BINSEXT)\"" ; done ; )
 
 # Definimos las variables de los archivos a generar pero con secuencias de escape para los espacios  
@@ -198,7 +198,7 @@ endef
 # Por defecto la regeneración de los archivos secundarios está activada
 REGENERATE_SECONDARY:=1
 ifneq ($(REGENERATE_SECONDARY),0)
-# Para buildear todos los binarios con sus SRCDIR/*.l como fuentes. Se ejecuta con <make> (por ser la primera regla) o <make all>
+# Para buildear todos los archivos secundarios y todos los binarios con sus SRCDIR/*.l como fuentes. Se ejecuta con <make> (por ser la primera regla) o <make all>
 all: $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(CSRCS)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(CDEPS)))) $(ESC_COBJS) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(YSRCS)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(YDEPS)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(LSRCS)))) $(subst ",,$(subst "\ "," ",$(subst $(espacio),\$(espacio),$(LDEPS)))) $(ESC_ALL)
 else
 # Para buildear todos los binarios con sus SRCDIR/*.l como fuentes. Se ejecuta con <make> (por ser la primera regla) o <make all>
@@ -229,7 +229,7 @@ run:
 # Para abrir los binarios que se buildean sucesivamente en ventanas nuevas
 open:
 	@echo ""
-	@echo "=================[ Ejecutar sucesivamente por separado de esta shell el/los binario/s: $(subst ",\",$(BINS)) ]================="
+	@echo "=================[ Ejecutar sucesivamente en una/s ventana/s nueva/s el/los binario/s: $(subst ",\",$(BINS)) ]================="
 	@for BIN in $(shell echo "$(subst ",\",$(BINS))" | sed 's|"$(BINDIR)/\([^"]*\)\.$(BINSEXT)"|"\1.$(BINSEXT)"|g' ;) ; do \
 		echo "" ; \
 		echo "<<< Ejecutando en una ventana nueva el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
@@ -324,7 +324,7 @@ cdebug-run:
 # Para depurar los binarios que se buildean sucesivamente en ventanas nuevas
 cdebug-open:
 	@echo ""
-	@echo "=================[ Depurar sucesivamente por separado de esta shell el/los binario/s: $(subst ",\",$(BINS)) ]================="
+	@echo "=================[ Depurar sucesivamente en una/s ventana/s nueva/s el/los binario/s: $(subst ",\",$(BINS)) ]================="
 	@for BIN in $(shell echo "$(subst ",\",$(BINS))" | sed 's|"$(BINDIR)/\([^"]*\)\.$(BINSEXT)"|"\1.$(BINSEXT)"|g' ;) ; do \
 		echo "" ; \
 		echo "<<< $(CDB): Depurando en una ventana nueva el binario: \"$(BINDIR)/$$BIN\" >>>" ; \
