@@ -412,7 +412,7 @@ $(ESC_BINDIR)/%.$(BINSEXT): $$(subst $$(espacio),\$$(espacio),$(SRCDIR)/%.l) $$(
 $(ESC_OBJDIR) $(ESC_BINDIR):
 	@echo ""
 	@echo "<<< Creando el directorio: \"$@\" >>>"
-	@echo "mkdir -p \"$@\"" ; mkdir -p "$@"
+	mkdir -p "$@"
 	@echo "<<< Realizado >>>"
 
 # Para CC: Para generar el archivo objeto $(OBJDIR)/%.o desde $(SRCDIR)/%.c con sus dependencias
@@ -458,7 +458,7 @@ $(ESC_OBJDIR)/%.lex.yy.o: $$(subst $$(espacio),\$$(espacio),$(SRCDIR)/%.l) $$(su
 	@$(call existe_comando,$(CC))
 	@echo "** Version instalada de $(CC): $$($(CC) --version | sed -n 1p) **"
 	$(CC) $(CFLAGS) $(C_LOBJFLAGS) -c -o"$@" "$(shell echo "$@" | sed 's|$(OBJDIR)/\(.*\)\.lex\.yy\.o|$(OBJDIR)/\1.lex.yy.c|' ;)" $(LIDIRS)
-	@echo "<<< Realizado >>>"}
+	@echo "<<< Realizado >>>"
 
 # Para LEX: Para generar el archivo del analizador léxico (scanner) $(OBJDIR)/%.lex.yy.c desde $(SRCDIR)/%.l
 $(ESC_OBJDIR)/%.lex.yy.c: $$(subst $$(espacio),\$$(espacio),$(SRCDIR)/%.l) | $$(subst $$(espacio),\$$(espacio),$(OBJDIR))
