@@ -56,41 +56,41 @@ else
 BINSEXT:=out
 endif
 
-# Acá se configura el modo debug de CC, YACC y LEX según se encuentre activado o desactivado
-# Por defecto el modo debug está desactivado: en caso de que no se le defina un valor a DEBUG al comando de make, es como si se le agregara DEBUG=0
-# Si se quiere activar el modo debug de CC, YACC y LEX, se debe agregar DEBUG=1 al comando de make. Por ejemplo: <make DEBUG=1>, <make all DEBUG=1> y <make clean all DEBUG=1>
+# Acá se configura el debug de CC, YACC y LEX según se encuentre habilitado o deshabilitado
+# Por defecto el debug está deshabilitado: en caso de que no se le defina un valor a DEBUG al comando de make, es como si se le agregara DEBUG=0
+# Si se quiere habilitar el debug de CC, YACC y LEX, se debe agregar DEBUG=1 al comando de make. Por ejemplo: <make DEBUG=1>, <make all DEBUG=1> y <make clean all DEBUG=1>
 DEBUG?=0
 ifneq ($(DEBUG),0)
-# Agregar acá los flags que se le quieran pasar a CC cuando se active el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs,COFF, XCOFF, o DWARF) para que pueda depurarse)
+# Agregar acá los flags que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs,COFF, XCOFF, o DWARF) para que pueda depurarse)
 CFLAGS+= -g
-# Agregar acá los flags que se le quieran pasar a YACC cuando se active el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+# Agregar acá los flags que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+= -t
-# Agregar acá los flags que se le quieran pasar a LEX cuando se active el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+# Agregar acá los flags que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+= -d
-# Cuando se active el modo debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
+# Cuando se habilite el debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS+= -DYYDEBUG=1
 else
-# Cuando se desactive el modo debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
+# Cuando se deshabilite el debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 C_YOBJFLAGS+= -DYYDEBUG=0
 endif
 
-# Acá se configuran los warnings de CC, YACC y LEX según se encuentren activados o desactivados
-# Por defecto los warnings están desactivados: en caso de que no se le defina un valor a WARNINGS a un comando de make al generar un archivo intermedio y/o al buildear un binario, es como si se le agregara WARNINGS=0
-# Si se quieren activar los warnings de CC, YACC y LEX, se deben tanto generar los archivos intermedios como buildear el binario estando los comandos de make con WARNINGS=1 agregado al hacerlo. Por ejemplo: <make WARNINGS=1>, <make all WARNINGS=1> y <make clean all WARNINGS=1>
+# Acá se configuran los warnings de CC, YACC y LEX según se encuentren habilitados o deshabilitados
+# Por defecto los warnings están deshabilitados: en caso de que no se le defina un valor a WARNINGS a un comando de make al generar un archivo intermedio y/o al buildear un binario, es como si se le agregara WARNINGS=0
+# Si se quieren habilitar los warnings de CC, YACC y LEX, se deben tanto generar los archivos intermedios como buildear el binario estando los comandos de make con WARNINGS=1 agregado al hacerlo. Por ejemplo: <make WARNINGS=1>, <make all WARNINGS=1> y <make clean all WARNINGS=1>
 WARNINGS?=0
 ifneq ($(WARNINGS),0)
-# Agregar acá los flags que se le quieran pasar a CC cuando se activen los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error)
+# Agregar acá los flags que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error)
 CFLAGS+= -Wall
-# Agregar acá los flags que se le quieran pasar a YACC cuando se activen los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
+# Agregar acá los flags que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
 YFLAGS+= -Wall
-# Agregar acá los flags que se le quieran pasar a LEX cuando se activen los warnings (WARNINGS=1)
+# Agregar acá los flags que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
 LFLAGS+=
 else
-# Agregar acá los flags que se le quieran pasar a CC cuando se desactiven los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
+# Agregar acá los flags que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
 CFLAGS+=
-# Agregar acá los flags que se le quieran pasar a YACC cuando se desactiven los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
+# Agregar acá los flags que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
 YFLAGS+=
-# Agregar acá los flags que se le quieran pasar a LEX cuando se desactiven los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
+# Agregar acá los flags que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
 LFLAGS+=
 endif
 
@@ -194,8 +194,8 @@ define existe_comando
 if ! command -v $(1) >/dev/null; then echo "ERROR: El comando <$(1)> no esta instalado y/o no se puede encontrar y ejecutar" ; exit 1 ; fi
 endef
 
-# Acá se configura el 'make all' según la regeneración de los archivos secundarios al ser eliminados se encuentre activada o desactivada
-# Por defecto la regeneración de los archivos secundarios está activada
+# Acá se configura el 'make all' según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
+# Por defecto la regeneración de los archivos secundarios está habilitada
 REGENERATE_SECONDARY:=1
 ifneq ($(REGENERATE_SECONDARY),0)
 # Para buildear todos los archivos secundarios y todos los binarios con sus SRCDIR/*.l como fuentes. Se ejecuta con <make> (por ser la primera regla) o <make all>
@@ -374,7 +374,7 @@ $(ESC_BINDIR)/%.$(BINSEXT): $$(subst $$(espacio),\$$(espacio),$(SRCDIR)/%.l) $$(
 # Anuncia que se completó el build
 	@echo ""
 	@echo "=================[ Finalizado ]================="
-# Muestra una nota si el modo debug está activado
+# Muestra una nota si el debug está habilitado
 	@if [ ! "$(DEBUG)" = "0" ]; then \
 		echo "" ; \
 		echo "NOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de $(YACC)" ; \
