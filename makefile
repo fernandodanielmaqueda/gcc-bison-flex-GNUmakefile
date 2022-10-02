@@ -4,7 +4,7 @@
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-# YACC-LEX-makefile: Este makefile sirve para compilar, ejecutar y depurar proyectos de LEX (archivos *.l) y proyectos de YACC (archivos *.y) + LEX (archivos *.l) (así como proyectos que utilicen programas compatibles con LEX y YACC, como ser flex y bison)
+# Bison-Flex-makefile: Este makefile sirve para compilar, ejecutar y depurar proyectos de Flex (archivos *.l) y proyectos de Bison (archivos *.y) + Flex (archivos *.l) (así como proyectos que utilicen programas similares, como ser Yacc y Lex)
 # Requiere GNU Make desde su versión 3.81 en adelante (u otros programas compatibles)
 # Asímismo necesita ser ejecutado en una shell compatible con sh (sh, bash, etc.) y poder utilizar los siguientes comandos: command printf echo cd mkdir rm rmdir true sed grep dirname sort uniq
 # Adicionalmente para poder abrir una nueva ventana, para Windows utiliza el comando start, y para el resto de los sistemas operativos utiliza el comando tmux
