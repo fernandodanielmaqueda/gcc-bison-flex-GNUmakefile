@@ -1,2 +1,2 @@
-# YACC-LEX-makefile
-Este makefile sirve para compilar, ejecutar y depurar proyectos de LEX (archivos *.l) y proyectos de YACC (archivos *.y) + LEX (archivos *.l) (así como proyectos que utilicen programas compatibles con LEX y YACC, como ser flex y bison)
+# BISON-FLEX-makefile
+Este makefile sirve para compilar, ejecutar y depurar proyectos de Flex (archivos *.l) y proyectos de Bison (archivos *.y) + Flex (archivos *.l) (así como proyectos que utilicen programas similares, como ser Lex y Yacc)
