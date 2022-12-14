@@ -4,7 +4,7 @@
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-# Bison-Flex-makefile: Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C, proyectos en lenguaje C con Flex (archivos *.l), proyectos en lenguaje C con Bison (archivos *.y), y proyectos en lenguaje C con Bison (archivos *.y) + Flex (archivos *.l) (así como proyectos que utilicen programas similares, como ser yacc y lex)
+# Bison-Flex-makefile: Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C, proyectos en lenguaje C con Flex (archivos *.l), proyectos en lenguaje C con Bison (archivos *.y), y proyectos en lenguaje C con Bison (archivos *.y) + Flex (archivos *.l) (así como proyectos que utilicen programas similares, como ser Yacc y Lex)
 # Requiere GNU Make desde su versión 3.81 en adelante (o algún otro programa compatible)
 # Para ejecutarse necesita sh (Bourne Shell) para ser utilizado como la shell y estar el comando <command> integrado en la misma (en inglés: 'shell built-in command')
 # También debe poder utilizar los siguientes comandos (disponibles en GNU coreutils (Core Utilities)): dirname echo false mkdir printf rm rmdir sort tr true uname uniq
