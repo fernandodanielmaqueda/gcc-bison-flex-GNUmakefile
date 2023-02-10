@@ -36,7 +36,7 @@ CDBFLAGS:=
 CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
 # Por ejemplo, aquí se ingresan los flags -I"Directorio" para CC, los cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
 
-# Agregar acá los flags -L (en LDFLAGS) y -l (en LDLIBS) para CC, los cuales sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
+# Agregar acá los flags -L (en LDFLAGS) y -l (en LDLIBS) para CC (los cuales este a su vez se los pasa al enlazador LD), los cuales sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
 # Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
 # Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/makefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
 LDFLAGS:=
@@ -72,7 +72,7 @@ endif
 DEBUG?=0
 ifneq ($(DEBUG),0)
 DEBUG_ENABLED:=Si
-# Agregar acá los flags que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs,COFF, XCOFF, o DWARF) para que pueda depurarse)
+# Agregar acá los flags que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
 CFLAGS+=-g
 # Agregar acá los flags que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
@@ -216,16 +216,16 @@ LOBJS:=$(shell ls "$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"*.l 2>/dev/null | sed -e 's?.*
 
 # Determina si sólo se han encontrado archivos fuente de C ($(SRCDIR)*.c) o no
 ifneq ($(YOBJS)$(LOBJS),)
-CEXCLUSIVELY:=0
 ifneq ($(YOBJS),)
+# Agrega el flag -ly para CC (y este a su vez se lo pasa al enlazador LD) para que incluya la biblioteca liby.a para YACC, ya que es necesaria. Si el enlazador no pudiera encontrar ese archivo, se lo debe indicar manualmente agregándolo en LDFLAGS.
 LDLIBS+=-ly
 endif
 ifneq ($(LOBJS),)
+# Agrega el flag -lfl para CC (y este a su vez se lo pasa al enlazador LD) para que incluya la biblioteca libfl.a para LEX, ya que es necesaria. Si el enlazador no pudiera encontrar ese archivo, se lo debe indicar manualmente agregándolo en LDFLAGS.
 LDLIBS+=-lfl
 endif
 else
 ifneq ($(COBJS),)
-CEXCLUSIVELY:=1
 else
 # Alerta si no ha encontrado ningún archivo fuente de C ($(SRCDIR)*.c), YACC ($(SRCDIR)*.y) ni de LEX ($(SRCDIR)*.l)
 $(error ERROR: no se ha encontrado ningun archivo de $(CC) (*.c), $(YACC) (*.y) ni $(LEX) (*.l) en el directorio de archivos fuente definido en la variable SRCDIR del makefile: "$(SRCDIR)")
@@ -384,7 +384,7 @@ clean:
 		printf "<<< Realizado >>>\n" ; \
 	fi ;
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ]; then \
-		case "$(CEXCLUSIVELY)" in (0) \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
 			for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
 				for EXT in .lex.yy.o .lex.yy.c ; do \
 					if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
@@ -396,6 +396,8 @@ clean:
 					fi ; \
 				done ; \
 			done ; \
+		fi ; \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
 			for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
 				for EXT in .tab.o .output .tab.h .tab.c ; do \
 					if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
@@ -406,17 +408,19 @@ clean:
 						printf "<<< Realizado >>>\n" ; \
 					fi ; \
 				done ; \
-			done ;; \
-		esac ; \
-		for COBJ in $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) ; do \
-			if [ -f "$$COBJ" ]; then \
-				printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$$COBJ" ; \
-				set -x ; \
-					rm -f "$$COBJ" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-		done ; \
+			done ; \
+		fi ; \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
+			for COBJ in $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) ; do \
+				if [ -f "$$COBJ" ]; then \
+					printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$$COBJ" ; \
+					set -x ; \
+						rm -f "$$COBJ" ; \
+					{ set +x ; } 2>/dev/null ; \
+					printf "<<< Realizado >>>\n" ; \
+				fi ; \
+			done ; \
+		fi ; \
 		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ; \
 		set -x ; \
 			rmdir "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" 2>/dev/null || true ; \
@@ -424,7 +428,7 @@ clean:
 		printf "<<< Realizado >>>\n" ; \
 	fi ;
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ]; then \
-		case "$(CEXCLUSIVELY)" in (0) \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
 			for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ]; then \
 					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
@@ -441,6 +445,8 @@ clean:
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
 			done ; \
+		fi ; \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
 			for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ]; then \
 					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
@@ -456,24 +462,26 @@ clean:
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
-			done ;; \
-		esac ; \
-		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"\1"?g' ;)) ; do \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ]; then \
-				printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
-				set -x ; \
-					rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ]; then \
-				printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
-				set -x ; \
-					rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-		done ; \
+			done ; \
+		fi ; \
+		if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
+			for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"\1"?g' ;)) ; do \
+				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ]; then \
+					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
+					set -x ; \
+						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
+					{ set +x ; } 2>/dev/null ; \
+					printf "<<< Realizado >>>\n" ; \
+				fi ; \
+				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ]; then \
+					printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
+					set -x ; \
+						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
+					{ set +x ; } 2>/dev/null ; \
+					printf "<<< Realizado >>>\n" ; \
+				fi ; \
+			done ; \
+		fi ; \
 		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ; \
 		set -x ; \
 			rmdir "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" 2>/dev/null || true ; \
@@ -581,8 +589,12 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESC
 	$(YACC) -d -v $(YFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.tab.c?' ;))" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 
+define archivos_de_cabecera_con_definiciones_de_yacc
+$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.h"?g' ;)
+endef
+
 # Regla implícita de tipo regla de patrón con LEX + CC: Para generar el archivo objeto $(OBJDIR)%.lex.yy.o desde $(OBJDIR)%.lex.yy.c
-$(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+$(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(archivos_de_cabecera_con_definiciones_de_yacc))
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(LEX)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
