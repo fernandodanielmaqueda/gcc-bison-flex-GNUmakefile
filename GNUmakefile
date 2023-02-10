@@ -214,10 +214,8 @@ COBJS:=$(shell ls "$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"*.c 2>/dev/null | sed -e 's?.*
 YOBJS:=$(shell ls "$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"*.y 2>/dev/null | sed -e 's?.*/??' -e 's?\(.*\)\.y?"$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.tab.o"?' ;)
 LOBJS:=$(shell ls "$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"*.l 2>/dev/null | sed -e 's?.*/??' -e 's?\(.*\)\.l?"$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.lex.yy.o"?' ;)
 
-# Para producir los nombres de todos los archivos de cabecera con definiciones de YACC a generar de acuerdo con los nombres ya determinados de todos los archivos objeto de YACC también a generar ($(OBJDIR)*.tab.o)
-define archivos_de_cabecera_con_definiciones_de_yacc
-$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.h"?g' ;)
-endef
+# Para producir los nombres de todos los archivos de cabecera con definiciones de YACC a generar ($(OBJDIR)*.tab.h) de acuerdo con los nombres ya determinados de todos los archivos objeto de YACC también a generar ($(OBJDIR)*.tab.o)
+YDEFS=$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.h"?g' ;)
 
 # Determina si sólo se han encontrado archivos fuente de C ($(SRCDIR)*.c) o no
 ifneq ($(YOBJS)$(LOBJS),)
@@ -567,7 +565,7 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 	@printf "<<< Realizado >>>\n"
 # Anuncia que se completó la construcción
 	@printf "\n=================[ Finalizado ]=================\n"
-# Muestra una nota si el debug está habilitado
+# Muestra una nota si hay YACC y si el debug está habilitado
 	@$(call mostrar_nota_sobre_yacc_si_la_depuracion_esta_habilitada)
 
 # Para habilitar una segunda expansión en los prerequisitos para todas las reglas que siguen a continuación
@@ -594,7 +592,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESC
 	@printf "<<< Realizado >>>\n"
 
 # Regla implícita de tipo regla de patrón con LEX + CC: Para generar el archivo objeto $(OBJDIR)%.lex.yy.o desde $(OBJDIR)%.lex.yy.c
-$(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(archivos_de_cabecera_con_definiciones_de_yacc))
+$(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(YDEFS))
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(LEX)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
