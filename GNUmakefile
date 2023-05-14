@@ -1,4 +1,4 @@
-# Copyright (C) 2022-2023 Fernando Daniel Maqueda
+# Copyright (C) 2022-2023 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -28,9 +28,9 @@ CC:=gcc
 YACC:=bison
 LEX:=flex
 
-# Depurador de C a usar y los flags a pasarle, respectivamente
-CDB:=gdb
-CDBFLAGS:=
+# Depurador a usar y los flags a pasarle, respectivamente
+GDB:=gdb
+GDBFLAGS:=
 
 # Agregar acá los flags de control de la etapa de preprocesamiento que se le quieran pasar siempre a CC
 CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
@@ -495,14 +495,14 @@ clean:
 # Regla explícita para depurar el binario que se construye desde la misma ventana
 cdebug-run:
 	@printf "\n=================[ Depurar en esta ventana el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(CDB): Depurando en esta ventana el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n<<< $(GDB): Depurando en esta ventana el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
-		$(call sh_existe_comando,$(CDB)) ; \
-		$(call sh_ruta_comando,$(CDB)) ; \
-		printf "** Version instalada de $(CDB): %s **\n" "$$($(CDB) --version | sed -n 1p 2>/dev/null)" ; \
+		$(call sh_existe_comando,$(GDB)) ; \
+		$(call sh_ruta_comando,$(GDB)) ; \
+		printf "** Version instalada de $(GDB): %s **\n" "$$($(GDB) --version | sed -n 1p 2>/dev/null)" ; \
 		set -x ; \
 			cd "$(DOLLAR-SIGNS-ESCAPED_BINDIR)" ; \
-			$(CDB) $(CDBFLAGS) "./$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+			$(GDB) $(GDBFLAGS) "./$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 			cd - >/dev/null ; \
 		{ set +x ; } 2>/dev/null ; \
 	else \
@@ -514,16 +514,16 @@ cdebug-run:
 # Regla explícita para depurar el binario que se construye en una ventana nueva
 cdebug-open:
 	@printf "\n=================[ Depurar en una ventana nueva el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(CDB): Depurando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n<<< $(GDB): Depurando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
-		$(call sh_existe_comando,$(CDB)) ; \
-		$(call sh_ruta_comando,$(CDB)) ; \
-		printf "** Version instalada de $(CDB): %s **\n" "$$($(CDB) --version | sed -n 1p 2>/dev/null)" ; \
+		$(call sh_existe_comando,$(GDB)) ; \
+		$(call sh_ruta_comando,$(GDB)) ; \
+		printf "** Version instalada de $(GDB): %s **\n" "$$($(GDB) --version | sed -n 1p 2>/dev/null)" ; \
 		case "$(OPEN_COMMAND)" in \
 			("start") \
 				set -x ; \
 					cd "$(DOLLAR-SIGNS-ESCAPED_BINDIR)" ; \
-					start $(CDB) $(CDBFLAGS) "$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+					start $(GDB) $(GDBFLAGS) "$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 					cd - >/dev/null ; \
 				{ set +x ; } 2>/dev/null ;; \
 			(*) \
@@ -532,7 +532,7 @@ cdebug-open:
 				printf "** Version instalada de tmux: %s **\n" "$$(tmux -V | sed -n 1p 2>/dev/null)" ; \
 				set -x ; \
 					cd "$(DOLLAR-SIGNS-ESCAPED_BINDIR)" ; \
-					tmux new "$(nota_tmux) set -x ; $(CDB) $(CDBFLAGS) \"$(call escapar_simbolo_pesos_conforme_a_shell,$(call escapar_simbolo_pesos_conforme_a_shell,$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)))\"" ; \
+					tmux new "$(nota_tmux) set -x ; $(GDB) $(GDBFLAGS) \"$(call escapar_simbolo_pesos_conforme_a_shell,$(call escapar_simbolo_pesos_conforme_a_shell,$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)))\"" ; \
 					cd - >/dev/null ; \
 				{ set +x ; } 2>/dev/null ; \
 				printf "NOTA: Para volver a las sesiones apartadas de tmux [detached], ejecute el comando <tmux attach>\n" ;; \
