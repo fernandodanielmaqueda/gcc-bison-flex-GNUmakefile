@@ -28,15 +28,19 @@ CC:=gcc
 YACC:=bison
 LEX:=flex
 
-# Depurador a usar y los flags a pasarle, respectivamente
+# Depurador a usar y las opciones a pasarle, respectivamente
 GDB:=gdb
 GDBFLAGS:=
 
-# Agregar acá los flags de control de la etapa de preprocesamiento que se le quieran pasar siempre a CC
-CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
-# Por ejemplo, aquí se ingresan los flags -I"Directorio" para CC, los cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
+# Agregar acá las opciones que controlan el dialecto del lenguaje C para CC
+CDIALECTFLAGS:=-std=99
+# Por ejemplo, -ansi ó -std=90 para C90, -std=99 para C99, -std=11 para C11, -std=18 para C18, etc.
 
-# Agregar acá los flags -L (en LDFLAGS) y -l (en LDLIBS) para CC, los cuales este a su vez se los pasa al enlazador LD y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
+# Agregar acá las opciones de control de la etapa de preprocesamiento que se le quieran pasar siempre a CC
+CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
+# Por ejemplo, aquí se ingresan las opciones -I"Directorio" para CC, los cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
+
+# Agregar acá las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, los cuales este a su vez se los pasa al enlazador LD y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
 # Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
 # Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/makefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
 LDFLAGS:=
@@ -50,19 +54,19 @@ LDLIBS:=-lm
 WARNINGS?=0
 ifneq ($(WARNINGS),0)
 WARNINGS_ENABLED:=Si
-# Agregar acá los flags que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
+# Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
 CFLAGS:=-Wall
-# Agregar acá los flags que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
+# Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
 YFLAGS:=-Wall
-# Agregar acá los flags que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
+# Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
 LFLAGS:=
 else
 WARNINGS_ENABLED:=No
-# Agregar acá los flags que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
+# Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
 CFLAGS:=
-# Agregar acá los flags que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
+# Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
 YFLAGS:=
-# Agregar acá los flags que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
+# Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
 LFLAGS:=
 endif
 
@@ -72,11 +76,11 @@ endif
 DEBUG?=0
 ifneq ($(DEBUG),0)
 DEBUG_ENABLED:=Si
-# Agregar acá los flags que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
+# Agregar acá las opciones que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
 CFLAGS+=-g
-# Agregar acá los flags que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+# Agregar acá las opciones que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
-# Agregar acá los flags que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+# Agregar acá las opciones que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+=-d
 # Cuando se habilite el debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=1
@@ -86,13 +90,13 @@ DEBUG_ENABLED:=No
 C_YOBJFLAGS:=-DYYDEBUG=0
 endif
 
-# Agregar acá otros flags que se le quieran pasar siempre a CC, YACC y LEX además de los flags que ya están, según corresponda
+# Agregar acá otras opciones que se le quieran pasar siempre a CC, YACC y LEX además de las opciones que ya están, según corresponda
 CFLAGS+=
 # Para YACC, por ejemplo, --report=state (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR), --report=lookahead (para incrementar la descripción del autómata con cada conjunto de tokens siguientes de cada regla sobre el archivo *.output generado), --report=itemset (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR), --report=lookahead (para incrementar la descripción del autómata con el conjunto completo de ítems derivados para cada estado, en lugar de solamente el denominado núcleo sobre el archivo *.output generado), etc.
 YFLAGS+=--report=state --report=lookahead --report=itemset
 LFLAGS+=
 
-# Agregar acá otros flags que se le quieran pasar siempre a CC sólo al generar los archivos objeto desde los de C fuentes (de *.c a *.o), desde los archivos de C generados por YACC (de *.tab.c a *.tab.o) y desde los archivos de C generados por LEX (de *.lex.yy.c a *.lex.yy.o) además de los flags que ya están, según corresponda
+# Agregar acá otras opciones que se le quieran pasar siempre a CC sólo al generar los archivos objeto desde los de C fuentes (de *.c a *.o), desde los archivos de C generados por YACC (de *.tab.c a *.tab.o) y desde los archivos de C generados por LEX (de *.lex.yy.c a *.lex.yy.o) además de las opciones que ya están, según corresponda
 C_COBJFLAGS+=
 C_YOBJFLAGS+=
 C_LOBJFLAGS+=
@@ -257,7 +261,7 @@ define receta_para_.d
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
 	printf "empty:\n\n%s" "$(call escapar_espacios,$(call escapar_espacios,$(1).d)) $(call escapar_espacios,$(call escapar_espacios,$(call escapar_simbolo_pesos_conforme_a_shell,$(OBJDIR))))" > "$(1).tmp"
-	$(CC) $(CPPFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { $(RM) "$(1).tmp" ; false ; }
+	$(CC) $(CDIALECTFLAGS) $(CPPFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { $(RM) "$(1).tmp" ; false ; }
 	sed -e ':a' -e '3s?^\([^:]*\)\(^\|[^\\]\)%?\1\2\\\%?' -e 't a' -e 's?\(^\|[^$$]\)\$$\($$\|[^$$]\)?\1$$$$\2?g' -e 's?\(^\|[^\\]\)#?\1\\\#?g' < "$(1).tmp" > "$(1).d"
 	$(RM) "$(1).tmp"
 	@printf "<<< Realizado >>>\n"
@@ -579,7 +583,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(O
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_YOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CDIALECTFLAGS) $(CPPFLAGS) $(CFLAGS) $(C_YOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 
 # Regla implícita de tipo regla de patrón con YACC: Para generar los archivos del analizador sintáctico (parser) $(OBJDIR)%.tab.c, $(OBJDIR)%.tab.h y $(OBJDIR)%.tab.output desde $(SRCDIR)%.y
@@ -598,7 +602,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_LOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CDIALECTFLAGS) $(CPPFLAGS) $(CFLAGS) $(C_LOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 
 # Regla implícita de tipo regla de patrón con LEX: Para generar el archivo del analizador léxico (scanner) $(OBJDIR)%.lex.yy.c desde $(SRCDIR)%.l
@@ -617,7 +621,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(SRCDI
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_COBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CDIALECTFLAGS) $(CPPFLAGS) $(CFLAGS) $(C_COBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 
 # Regla implícita de tipo regla de patrón con una receta vacía que no hace nada: Para evitar errores al momento de incluir los otros makefiles con prerequisitos generados automáticamente, respecto de los objetivos $(DEPDIR)%.d , $(DEPDIR)%.tab.d y $(DEPDIR)%.lex.yy.d , los cuales son creados como efecto secundario de las recetas para los objetivos $(OBJDIR)%.o , $(OBJDIR)%.tab.o y $(OBJDIR)%.lex.yy.o respectivamente: si el objetivo no existe la receta vacía asegura de que make no reclamará sobre que no sabe cómo construir el objetivo, y sólo asumirá de que el objetivo está obsoleto
