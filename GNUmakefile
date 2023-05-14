@@ -511,8 +511,8 @@ cli_bin_debug_run:
 
 # Regla explícita para depurar el binario que se construye en una ventana nueva por medio de una interfaz de línea de comandos (CLI)
 cli_bin_debug_open:
-	@printf "\n=================[ Depurar en una ventana nueva el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(GDB): Depurando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n=================[ Depurar en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n<<< $(GDB): Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		$(call sh_existe_comando,$(GDB)) ; \
 		$(call sh_ruta_comando,$(GDB)) ; \
