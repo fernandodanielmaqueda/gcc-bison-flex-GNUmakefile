@@ -257,9 +257,9 @@ define receta_para_.d
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
 	printf "empty:\n\n%s" "$(call escapar_espacios,$(call escapar_espacios,$(1).d)) $(call escapar_espacios,$(call escapar_espacios,$(call escapar_simbolo_pesos_conforme_a_shell,$(OBJDIR))))" > "$(1).tmp"
-	$(CC) $(CPPFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { rm -f "$(1).tmp" ; false ; }
+	$(CC) $(CPPFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { $(RM) "$(1).tmp" ; false ; }
 	sed -e ':a' -e '3s?^\([^:]*\)\(^\|[^\\]\)%?\1\2\\\%?' -e 't a' -e 's?\(^\|[^$$]\)\$$\($$\|[^$$]\)?\1$$$$\2?g' -e 's?\(^\|[^\\]\)#?\1\\\#?g' < "$(1).tmp" > "$(1).d"
-	rm -f "$(1).tmp"
+	$(RM) "$(1).tmp"
 	@printf "<<< Realizado >>>\n"
 endef
 
@@ -268,7 +268,7 @@ define forzar_eliminacion_si_ya_existiera_el_binario
 	if [ -f "$(1)" ]; then \
 		printf "\n<<< Eliminando el binario ya existente: \"%s\" >>>\n" "$(1)" ; \
 		set -x ; \
-			rm -f "$(1)" ; \
+			$(RM) "$(1)" ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
 	fi ;
@@ -375,7 +375,7 @@ clean:
 		if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 			printf "\n<<< Eliminando el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 			set -x ; \
-				rm -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+				$(RM) "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 			{ set +x ; } 2>/dev/null ; \
 			printf "<<< Realizado >>>\n" ; \
 		fi ; \
@@ -392,7 +392,7 @@ clean:
 					if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
 						printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
 						set -x ; \
-							rm -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
+							$(RM) "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
 						{ set +x ; } 2>/dev/null ; \
 						printf "<<< Realizado >>>\n" ; \
 					fi ; \
@@ -405,7 +405,7 @@ clean:
 					if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
 						printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
 						set -x ; \
-							rm -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
+							$(RM) "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
 						{ set +x ; } 2>/dev/null ; \
 						printf "<<< Realizado >>>\n" ; \
 					fi ; \
@@ -417,7 +417,7 @@ clean:
 				if [ -f "$$COBJ" ]; then \
 					printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$$COBJ" ; \
 					set -x ; \
-						rm -f "$$COBJ" ; \
+						$(RM) "$$COBJ" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
@@ -435,14 +435,14 @@ clean:
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ]; then \
 					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ]; then \
 					printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
@@ -453,14 +453,14 @@ clean:
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ]; then \
 					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ]; then \
 					printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
@@ -471,14 +471,14 @@ clean:
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ]; then \
 					printf "\n<<< Eliminando el otro makefile con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
 				if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ]; then \
 					printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
 					set -x ; \
-						rm -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
+						$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
 					{ set +x ; } 2>/dev/null ; \
 					printf "<<< Realizado >>>\n" ; \
 				fi ; \
