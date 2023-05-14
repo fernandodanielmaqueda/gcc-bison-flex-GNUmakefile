@@ -299,7 +299,7 @@ endef
 # 	Esto se efectúa para cancelar las reglas implícitas predefinidas por make, ya que ninguna de ellas se utilizará y además con esto se ahorra en tiempo de ejecución
 
 # Para especificar los objetivos que no generan archivos con ese mismo nombre para que se ejecuten siempre por más de que los archivos puedan llegar a existir
-.PHONY: all run open clean cdebug-run cdebug-open empty
+.PHONY: all run open clean cli_bin_debug_run cli_bin_debug_open empty
 # 	La receta de una regla siempre se ejecutará si tiene como prerequisito de tipo normal a un target que sea .PHONY
 
 # Para que make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
@@ -490,10 +490,10 @@ clean:
 	fi ;
 	@printf "\n=================[ Finalizado ]=============\n"
 
-# Regla explícita para depurar el binario que se construye desde la misma ventana
-cdebug-run:
-	@printf "\n=================[ Depurar en esta ventana el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(GDB): Depurando en esta ventana el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+# Regla explícita para depurar el binario que se construye desde la misma ventana por medio de una interfaz de línea de comandos (CLI)
+cli_bin_debug_run:
+	@printf "\n=================[ Depurar en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n<<< $(GDB): Depurando en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		$(call sh_existe_comando,$(GDB)) ; \
 		$(call sh_ruta_comando,$(GDB)) ; \
@@ -509,8 +509,8 @@ cdebug-run:
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
 
-# Regla explícita para depurar el binario que se construye en una ventana nueva
-cdebug-open:
+# Regla explícita para depurar el binario que se construye en una ventana nueva por medio de una interfaz de línea de comandos (CLI)
+cli_bin_debug_open:
 	@printf "\n=================[ Depurar en una ventana nueva el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@printf "\n<<< $(GDB): Depurando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
