@@ -1,11 +1,11 @@
-# gcc-bison-flex-GNUmakefile: Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
-# Copyright (C) 2022-2023 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
-
-# This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+# gcc-bison-flex-GNUmakefile, versión 2023.05.15-002-pre
+# Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
+
+# Copyright (C) 2022-2023 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
+# This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+# This is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.
 
 # Nombre del proyecto
 PROGRAM:=miproyecto
@@ -46,19 +46,19 @@ LDLIBS:=-lm
 WARNINGS?=0
 ifneq ($(WARNINGS),0)
 WARNINGS_ENABLED:=Si
-# Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
 CFLAGS:=-Wall
-# Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
 YFLAGS:=-Wall
-# Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
 LFLAGS:=
 else
 WARNINGS_ENABLED:=No
-# Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
 CFLAGS:=
-# Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
 YFLAGS:=
-# Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
 LFLAGS:=
 endif
 
@@ -68,17 +68,17 @@ endif
 DEBUG?=0
 ifneq ($(DEBUG),0)
 DEBUG_ENABLED:=Si
-# Agregar acá las opciones que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
 CFLAGS+=-g
-# Agregar acá las opciones que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
-# Agregar acá las opciones que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+=-d
-# Cuando se habilite el debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
+# 	Cuando se habilite el debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=1
 else
 DEBUG_ENABLED:=No
-# Cuando se deshabilite el debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
+# 	Cuando se deshabilite el debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=0
 endif
 
@@ -154,7 +154,7 @@ $(foreach comando,grep sed,$(eval $(call make_comprobar_otro_comando,$(comando))
 # Detecta si el sistema operativo es Windows o no, sabiendo que si lo es, Windows define una variable de entorno (Windows Environment Variable) con nombre 'OS' hoy en día típicamente con valor 'Windows_NT'
 ifeq ($(OS),Windows_NT)
 SO:=Windows_NT
-# En caso de que el sistema operativo es Windows, se detecta si la aplicación y la arquitectura del procesador son de 32 o de 64 bits (sabiendo que Windows define una variable de entorno (Windows Environment Variable) con nombre 'PROCESSOR_ARCHITECTURE' típicamente con valor 'AMD64' tanto para aplicación como procesador de 64 bits, y sino usualmente con valor 'x86' para aplicación de 32 bits, en cuyo caso Windows también define define una variable de entorno (Windows Environment Variable) con nombre 'PROCESSOR_ARCHITEW6432' típicamente con valor 'AMD64' para procesador de 64 bits, y sino usualmente con valor 'x86' para procesador de 32 bits
+# 	En caso de que el sistema operativo es Windows, se detecta si la aplicación y la arquitectura del procesador son de 32 o de 64 bits (sabiendo que Windows define una variable de entorno (Windows Environment Variable) con nombre 'PROCESSOR_ARCHITECTURE' típicamente con valor 'AMD64' tanto para aplicación como procesador de 64 bits, y sino usualmente con valor 'x86' para aplicación de 32 bits, en cuyo caso Windows también define define una variable de entorno (Windows Environment Variable) con nombre 'PROCESSOR_ARCHITEW6432' típicamente con valor 'AMD64' para procesador de 64 bits, y sino usualmente con valor 'x86' para procesador de 32 bits
 ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 BITS_APPLICATION:=64
 BITS_PROCESSOR:=64
@@ -166,11 +166,11 @@ else
 BITS_PROCESSOR:=32
 endif
 endif
-# Para definir si la shell puede ejecutar el comando <start> de Windows o no
+# 	Para definir si la shell puede ejecutar el comando <start> de Windows o no
 ifneq ($(shell command -v start ;),)
 OPEN_COMMAND:=start
 endif
-# Para definir si la shell puede ejecutar el comando <where> de Windows o no
+# 	Para definir si la shell puede ejecutar el comando <where> de Windows o no
 ifneq ($(shell command -v where ;),)
 PATHNAME_COMMAND:=where
 endif
