@@ -323,8 +323,8 @@ GNUmakefile:: ;
 
 # Regla explícita para ejecutar el binario que se construye desde la misma ventana
 run:
-	@printf "\n=================[ Ejecutar en esta ventana el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< Ejecutando en esta ventana el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n=================[ Ejecutar el binario en esta ventana ]=================\n"
+	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		set -x ; \
 			cd "$(DOLLAR-SIGNS-ESCAPED_BINDIR)" ; \
@@ -339,8 +339,8 @@ run:
 
 # Regla explícita para abrir el binario que se construye en una ventana nueva
 open:
-	@printf "\n=================[ Ejecutar en una ventana nueva el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< Ejecutando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n=================[ Ejecutar el binario en una ventana nueva ]=================\n"
+	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		case "$(OPEN_COMMAND)" in \
 			("start") \
@@ -492,8 +492,8 @@ clean:
 
 # Regla explícita para depurar el binario que se construye desde la misma ventana por medio de una interfaz de línea de comandos (CLI)
 cli_bin_debug_run:
-	@printf "\n=================[ Depurar en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(GDB): Depurando en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n=================[ Depurar el binario en esta ventana por medio de una interfaz de linea de comandos (CLI) ]=================\n"
+	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		$(call sh_existe_comando,$(GDB)) ; \
 		$(call sh_ruta_comando,$(GDB)) ; \
@@ -511,8 +511,8 @@ cli_bin_debug_run:
 
 # Regla explícita para depurar el binario que se construye en una ventana nueva por medio de una interfaz de línea de comandos (CLI)
 cli_bin_debug_open:
-	@printf "\n=================[ Depurar en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" ]=================\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
-	@printf "\n<<< $(GDB): Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
+	@printf "\n=================[ Depurar el binario en una ventana nueva por medio de una interfaz de linea de comandos (CLI) ]=================\n"
+	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		$(call sh_existe_comando,$(GDB)) ; \
 		$(call sh_ruta_comando,$(GDB)) ; \
