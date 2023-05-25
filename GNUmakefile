@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.25-001-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.25-002-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -178,6 +178,11 @@ SHELL:=/bin/sh
 # Comprueba que se haya encontrado una shell sh en el sistema
 ifeq ($(wildcard $(call escapar_espacios,$(SHELL))),)
 $(error ERROR: no hay una shell sh instalada y/o no se ha podido encontrar y ejecutar)
+endif
+
+# Comprueba que la función $(shell ...) se ejecute correctamente. Una de las posibles causas por las que que falla es utilizar alguna de las opciones '-n', '--just-print', '--dry-run' y/o '--recon' al invocar a make, con las cuales se arroja un error similar al siguiente: process_begin: CreateProcess(NULL, "", ...) failed.
+ifeq ($(shell echo foo ;),)
+$(error ERROR: La funcion shell de GNU Make, necesaria para que pueda funcionar este makefile, no se puede ejecutar correctamente)
 endif
 
 # Comprueba que el comando <command> se pueda encontrar
