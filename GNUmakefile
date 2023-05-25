@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.15-002-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.25-001-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -40,46 +40,92 @@ LDLIBS:=-lm
 # 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este makefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
 # 	Más abajo se agregan -lfl y -ly para incluir las bibliotecas libfl.a y liby.a para LEX y YACC según sea necesario. Si el compilador no encontrara alguno de esos archivos, se los debe indicar manualmente agregándolos en LDFLAGS.
 
-# Acá se configuran los warnings de CC, YACC y LEX según se encuentren habilitados o deshabilitados
-# 	Por defecto los warnings están deshabilitados: en caso de que no se le defina un valor a WARNINGS a un comando de make al generar un archivo intermedio y/o al construir un binario, es como si se le agregara WARNINGS=0
-# 	Si se quieren habilitar los warnings de CC, YACC y LEX, se deben tanto generar los archivos intermedios así como construir el binario estando los comandos de make con WARNINGS=1 agregado al hacerlo. Por ejemplo: <make WARNINGS=1>, <make all WARNINGS=1> y <make clean all WARNINGS=1>
-WARNINGS?=0
-ifneq ($(WARNINGS),0)
-WARNINGS_ENABLED:=Si
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
+# Acá se configuran los warnings de CC según se encuentren habilitados o deshabilitados
+# 	Por defecto los warnings de CC se habilitan: en caso de que no se le defina un valor a WARNINGS_CC a un comando de make al generar un archivo intermedio y/o al construir un binario, es como si se le agregara WARNINGS_CC=1
+# 	Si se quieren deshabilitar los warnings de CC se debe agregar WARNINGS_CC=0 al comando de make. Por ejemplo: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
+WARNINGS_CC?=1
+ifneq ($(WARNINGS_CC),0)
+WARNINGS_CC_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten sus warnings (WARNINGS_CC=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
 CFLAGS:=-Wall
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten los warnings (WARNINGS=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
+else
+WARNINGS_CC_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten sus warnings (WARNINGS_CC=0), como ser -w (para no mostrar ningún warning)
+CFLAGS:=
+endif
+
+# Acá se configuran los warnings de YACC según se encuentren habilitados o deshabilitados
+# 	Por defecto los warnings de YACC se habilitan: en caso de que no se le defina un valor a WARNINGS_YACC a un comando de make al generar un archivo intermedio y/o al construir un binario, es como si se le agregara WARNINGS_YACC=1
+# 	Si se quieren deshabilitar los warnings de YACC se debe agregar WARNINGS_YACC=0 al comando de make. Por ejemplo: <make WARNINGS_YACC=0>, <make all WARNINGS_YACC=0> y <make clean all WARNINGS_YACC=0>
+WARNINGS_YACC?=1
+ifneq ($(WARNINGS_YACC),0)
+WARNINGS_YACC_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten sus warnings (WARNINGS_YACC=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
 YFLAGS:=-Wall
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten los warnings (WARNINGS=1)
+else
+WARNINGS_YACC_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten sus warnings (WARNINGS_YACC=0), como ser -Wnone (para no mostrar ningún warning)
+YFLAGS:=
+endif
+
+# Acá se configuran los warnings de LEX según se encuentren habilitados o deshabilitados
+# 	Por defecto los warnings de LEX se habilitan: en caso de que no se le defina un valor a WARNINGS_LEX a un comando de make al generar un archivo intermedio y/o al construir un binario, es como si se le agregara WARNINGS_LEX=1
+# 	Si se quieren deshabilitar los warnings de LEX se debe agregar WARNINGS_LEX=0 al comando de make. Por ejemplo: <make WARNINGS_LEX=0>, <make all WARNINGS_LEX=0> y <make clean all WARNINGS_LEX=0>
+WARNINGS_LEX?=1
+ifneq ($(WARNINGS_LEX),0)
+WARNINGS_LEX_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten sus warnings (WARNINGS_LEX=1)
 LFLAGS:=
 else
-WARNINGS_ENABLED:=No
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para no mostrar ningún warning)
-CFLAGS:=
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten los warnings (WARNINGS=0), como ser -Wnone (para no mostrar ningún warning)
-YFLAGS:=
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten los warnings (WARNINGS=0), como ser -w (para suprimir todos los mensajes de warning)
+WARNINGS_LEX_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten sus warnings (WARNINGS_LEX=0), como ser -w (para suprimir todos los mensajes de warning)
 LFLAGS:=
 endif
 
-# Acá se configura el debug de CC, YACC y LEX según se encuentre habilitado o deshabilitado
-# 	Por defecto el debug está deshabilitado: en caso de que no se le defina un valor a DEBUG al comando de make, es como si se le agregara DEBUG=0
-# 	Si se quiere habilitar el debug de CC, YACC y LEX, se debe agregar DEBUG=1 al comando de make. Por ejemplo: <make DEBUG=1>, <make all DEBUG=1> y <make clean all DEBUG=1>
-DEBUG?=0
-ifneq ($(DEBUG),0)
-DEBUG_ENABLED:=Si
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habilite el modo debug (DEBUG=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
+# Acá se configuran los símbolos de depuración de CC según se encuentren habilitados o deshabilitados
+# 	Por defecto los símbolos de depuración de CC se habilitan: en caso de que no se le defina un valor a DEBUG_CC al comando de make, es como si se le agregara DEBUG_CC=1
+# 	Si se quieren deshabilitar los símbolos de depuración de CC, se debe agregar DEBUG_CC=0 al comando de make. Por ejemplo: <make DEBUG_CC=0>, <make all DEBUG_CC=0> y <make clean all DEBUG_CC=0>
+DEBUG_CC?=1
+ifneq ($(DEBUG_CC),0)
+DEBUG_CC_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten sus símbolos de depuración (DEBUG_CC=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
 CFLAGS+=-g
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habilite el modo debug (DEBUG=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+else
+DEBUG_CC_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten sus símbolos de depuración (DEBUG_CC=0)
+CFLAGS+=
+endif
+
+# Acá se configuran los símbolos de depuración de YACC según se encuentren habilitados o deshabilitados
+# 	Por defecto los símbolos de depuración de YACC se deshabilitan: en caso de que no se le defina un valor a DEBUG_YACC al comando de make, es como si se le agregara DEBUG_YACC=0
+# 	Si se quieren habilitar los símbolos de depuración de YACC, se debe agregar DEBUG_YACC=1 al comando de make. Por ejemplo: <make DEBUG_YACC=1>, <make all DEBUG_YACC=1> y <make clean all DEBUG_YACC=1>
+DEBUG_YACC?=0
+ifneq ($(DEBUG_YACC),0)
+DEBUG_YACC_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten sus símbolos de depuración (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habilite el modo debug (DEBUG=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
-LFLAGS+=-d
-# 	Cuando se habilite el debug (DEBUG=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
+# 	Cuando se habiliten los símbolos de depuración de YACC (DEBUG_YACC=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=1
 else
-DEBUG_ENABLED:=No
-# 	Cuando se deshabilite el debug (DEBUG=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
+DEBUG_YACC_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten sus símbolos de depuración (DEBUG_YACC=0)
+YFLAGS+=
+# 	Cuando se deshabiliten los símbolos de depuración de YACC (DEBUG_YACC=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=0
+endif
+
+# Acá se configuran los símbolos de depuración de LEX según se encuentren habilitados o deshabilitados
+# 	Por defecto los símbolos de depuración de LEX se deshabilitan: en caso de que no se le defina un valor a DEBUG_LEX al comando de make, es como si se le agregara DEBUG_LEX=0
+# 	Si se quieren habilitar los símbolos de depuración de LEX, se debe agregar DEBUG_LEX=1 al comando de make. Por ejemplo: <make DEBUG_LEX=1>, <make all DEBUG_LEX=1> y <make clean all DEBUG_LEX=1>
+DEBUG_LEX?=0
+ifneq ($(DEBUG_LEX),0)
+DEBUG_LEX_ACTIVATION:=Si
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten sus símbolos de depuración (DEBUG_LEX=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+LFLAGS+=-d
+else
+DEBUG_LEX_ACTIVATION:=No
+# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten sus símbolos de depuración (DEBUG_LEX=0)
+LFLAGS+=
 endif
 
 # Agregar acá otras opciones que se le quieran pasar siempre a CC, YACC y LEX además de las opciones que ya están, según corresponda
@@ -134,9 +180,9 @@ ifeq ($(wildcard $(call escapar_espacios,$(SHELL))),)
 $(error ERROR: no hay una shell sh instalada y/o no se ha podido encontrar y ejecutar)
 endif
 
-# Comprueba que el comando <command> se encuentre integrado en la shell (en inglés: 'shell built-in command')
+# Comprueba que el comando <command> se pueda encontrar
 ifeq ($(shell command -v cd ;),)
-$(error ERROR: El comando <command>, necesario para que pueda funcionar este makefile, no se encuentra integrado en la shell)
+$(error ERROR: El comando <command>, necesario para que pueda funcionar este makefile, no esta instalado y/o no se puede encontrar y ejecutar)
 endif
 
 # Comprueba que se puedan encontrar todos los comandos necesarios que se presentan en GNU coreutils (Core Utilities)
@@ -250,7 +296,7 @@ endif
 
 # Define una secuencia de comandos enlatada para producir el otro makefile $(DEPDIR)%.d a incluir con prerequisitos generados automáticamente desde $(SRCDIR)%.c
 define receta_para_.d
-	@printf "\n<<< $(CC): Produciendo el otro makefile a incluir con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(1).d" 
+	@printf "\n<<< $(CC): Produciendo el otro makefile a incluir con prerequisitos generados automaticamente: \"%s\" >>>\n" "$(1).d"
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
@@ -272,9 +318,9 @@ define forzar_eliminacion_si_ya_existiera_el_binario
 	fi ;
 endef
 
-# Define una secuencia de comandos enlatada que muestra una nota si el debug está habilitado
-define mostrar_nota_sobre_yacc_si_la_depuracion_esta_habilitada
-	if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ] && [ "X0" != "X$(DEBUG)" ]; then \
+# Define una secuencia de comandos enlatada que muestra una nota si la depuración de YACC está habilitada
+define mostrar_nota_sobre_yacc_si_su_depuracion_esta_habilitada
+	if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ] && [ "X0" != "X$(DEBUG_YACC)" ]; then \
 		printf "\nNOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de $(YACC)\n" ; \
 		printf "  Para depurar $(YACC), tambien debe asignarle un valor entero distinto de 0 a la variable de tipo int yydebug\n" ; \
 		printf "  Una manera de lograr eso es agregarle el siguiente codigo al main() antes de que se llame a yyparse():\n" ; \
@@ -555,7 +601,7 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 # 	Si el binario ya existiera, fuerza su eliminación por si el archivo está en uso, ya que esto impediría su construcción
 	@$(call forzar_eliminacion_si_ya_existiera_el_binario,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
 # 	Construye el binario
-	@printf "\n<<< $(CC)->$(CC): Enlazando el/los archivo/s objeto con la/s biblioteca/s para construir el binario: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< $(CC)->$(CC): Enlazando el/los archivo/s objeto con la/s biblioteca/s para construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
@@ -563,8 +609,8 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 	@printf "<<< Realizado >>>\n"
 # 	Anuncia que se completó la construcción
 	@printf "\n=================[ Finalizado ]=================\n"
-# 	Muestra una nota si hay YACC y si el debug está habilitado
-	@$(call mostrar_nota_sobre_yacc_si_la_depuracion_esta_habilitada)
+# 	Muestra una nota si hay YACC y si su depuración está habilitada
+	@$(call mostrar_nota_sobre_yacc_si_su_depuracion_esta_habilitada)
 
 # Para habilitar una segunda expansión en los prerequisitos para todas las reglas que siguen a continuación
 .SECONDEXPANSION:
@@ -573,7 +619,7 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 # Regla implícita de tipo regla de patrón con YACC + CC: Para generar el archivo objeto $(OBJDIR)%.tab.o desde $(OBJDIR)%.tab.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(OBJDIR)%.tab.c) $$(call escapar_espacios,$$(SRCDIR)%.y) $$(call escapar_espacios,$$(DEPDIR)%.tab.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(YACC)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< $(YACC)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
@@ -582,7 +628,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(O
 
 # Regla implícita de tipo regla de patrón con YACC: Para generar los archivos del analizador sintáctico (parser) $(OBJDIR)%.tab.c, $(OBJDIR)%.tab.h y $(OBJDIR)%.tab.output desde $(SRCDIR)%.y
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.h $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.output: $$(call escapar_espacios,$$(SRCDIR)%.y) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
-	@printf "\n<<< $(YACC): Generando los archivos del analizador sintactico (parser): \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1<.tab.c><.tab.h><.output>?' ;))"
+	@printf "\n<<< $(YACC): Generando los archivos del analizador sintactico (parser): \"%s\" [WARNINGS_YACC: $(WARNINGS_YACC_ACTIVATION) | DEBUG_YACC: $(DEBUG_YACC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1<.tab.c><.tab.h><.output>?' ;))"
 	@$(call sh_existe_comando,$(YACC))
 	@$(call sh_ruta_comando,$(YACC))
 	@printf "** Version instalada de $(YACC): %s **\n" "$$($(YACC) --version | sed -n 1p 2>/dev/null)"
@@ -592,7 +638,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESC
 # Regla implícita de tipo regla de patrón con LEX + CC: Para generar el archivo objeto $(OBJDIR)%.lex.yy.o desde $(OBJDIR)%.lex.yy.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(YDEFS))
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(LEX)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< $(LEX)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
@@ -601,7 +647,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$
 
 # Regla implícita de tipo regla de patrón con LEX: Para generar el archivo del analizador léxico (scanner) $(OBJDIR)%.lex.yy.c desde $(SRCDIR)%.l
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.c: $$(call escapar_espacios,$$(SRCDIR)%.l) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
-	@printf "\n<<< $(LEX): Generando el archivo del analizador lexico (scanner): \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< $(LEX): Generando el archivo del analizador lexico (scanner): \"%s\" [WARNINGS_LEX: $(WARNINGS_LEX_ACTIVATION) | DEBUG_LEX: $(DEBUG_LEX_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(LEX))
 	@$(call sh_ruta_comando,$(LEX))
 	@printf "** Version instalada de $(LEX): %s **\n" "$$($(LEX) --version | sed -n 1p 2>/dev/null)"
@@ -611,7 +657,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.c: $$(call escapar_espacios,$
 # Regla implícita de tipo regla de patrón con CC: Para generar el archivo objeto $(OBJDIR)%.o desde $(SRCDIR)%.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(SRCDIR)%.c) $$(call escapar_espacios,$$(DEPDIR)%.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(CC): Generando el archivo objeto: \"%s\" [WARNINGS: $(WARNINGS_ENABLED) | DEBUG: $(DEBUG_ENABLED)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< $(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
 	@$(call sh_ruta_comando,$(CC))
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
