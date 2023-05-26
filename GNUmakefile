@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.25-002-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.25-003-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -30,9 +30,10 @@ GDBFLAGS:=
 
 # Agregar acá las opciones que controlan el preprocesador del lenguaje C
 CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
-# 	Por ejemplo, aquí se ingresan las opciones -I"Directorio", los cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
+# 	Por ejemplo, aquí se ingresan las opciones -I"Directorio" para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
 
-# Agregar acá las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, los cuales este a su vez se los pasa al enlazador LD y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
+# Agregar acá las opciones para enlazar
+#	Por ejemplo, añadir las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, las cuales este a su vez se los pasa al enlazador ld y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
 # 	Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
 # 	Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/makefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
 LDFLAGS:=
@@ -40,17 +41,26 @@ LDLIBS:=-lm
 # 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este makefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
 # 	Más abajo se agregan -lfl y -ly para incluir las bibliotecas libfl.a y liby.a para LEX y YACC según sea necesario. Si el compilador no encontrara alguno de esos archivos, se los debe indicar manualmente agregándolos en LDFLAGS.
 
-# Acá se configuran los warnings de CC según se encuentren habilitados o deshabilitados
+# Acá se configuran las opciones para requerir o suprimir las advertencias (warnings) de CC según éstas se encuentren habilitadas o deshabilitadas
 # 	Por defecto los warnings de CC se habilitan: en caso de que no se le defina un valor a WARNINGS_CC a un comando de make al generar un archivo intermedio y/o al construir un binario, es como si se le agregara WARNINGS_CC=1
 # 	Si se quieren deshabilitar los warnings de CC se debe agregar WARNINGS_CC=0 al comando de make. Por ejemplo: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
 WARNINGS_CC?=1
 ifneq ($(WARNINGS_CC),0)
 WARNINGS_CC_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten sus warnings (WARNINGS_CC=1), como ser -Wall (para mostrar la mayoría de los tipos de warnings), -Wextra (para mostrar aún más tipos de warnings que -Wall), -Werror (para tratar a todos los warnings como errores), -Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error), -Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada), -Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada), -Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada), etc.
-CFLAGS:=-Wall
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando se habiliten sus warnings (WARNINGS_CC=1), como ser, entre otras:
+#		-Wall (para mostrar la mayoría de los tipos de warnings)
+#		-Wextra (para mostrar aún más tipos de warnings que -Wall)
+#		-Werror (para tratar a todos los warnings como errores)
+#		-Wfatal-errors (para que no siga con la compilación tras ocurrir algún error, en lugar de intentar continuar e imprimir más mensajes de error)
+#		-Wpedantic (para que muestre todos los warnings demandados estrictamente por el ISO C; rechace todos los programas que usen extensiones del lenguaje prohibidas, y algunos otros programas que no sigan el ISO C. Para ISO C, sigue la versión del estándar ISO C especificado por cualquier opción -std especificada)
+#		-pedantic-errors (da un error donde sea que el estándar base requiera un diagnóstico, en algunos casos en donde hay comportamiento indefinido en tiempo de compilación y en otros casos que no previenen la compilación de programas que son válidos de acuerdo con el estándar. Esta opción NO es equivalente a la opción -Werror=pedantic, ya que hay errores habilitados por esta opción y no habilitados por la última y viceversa)
+#		-Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada)
+#		-Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada)
+#		-Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada)
+CFLAGS:=-Wall -Wpedantic -pedantic-errors
 else
 WARNINGS_CC_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten sus warnings (WARNINGS_CC=0), como ser -w (para no mostrar ningún warning)
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando se deshabiliten sus warnings (WARNINGS_CC=0), como ser -w (para no mostrar ningún warning)
 CFLAGS:=
 endif
 
@@ -60,11 +70,11 @@ endif
 WARNINGS_YACC?=1
 ifneq ($(WARNINGS_YACC),0)
 WARNINGS_YACC_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten sus warnings (WARNINGS_YACC=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando se habiliten sus warnings (WARNINGS_YACC=1), como ser -Wall (para mostrar todos los warnings), -Werror (para tratar a los warnings como errores), etc.
 YFLAGS:=-Wall
 else
 WARNINGS_YACC_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten sus warnings (WARNINGS_YACC=0), como ser -Wnone (para no mostrar ningún warning)
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando se deshabiliten sus warnings (WARNINGS_YACC=0), como ser -Wnone (para no mostrar ningún warning)
 YFLAGS:=
 endif
 
@@ -74,11 +84,11 @@ endif
 WARNINGS_LEX?=1
 ifneq ($(WARNINGS_LEX),0)
 WARNINGS_LEX_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten sus warnings (WARNINGS_LEX=1)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando se habiliten sus warnings (WARNINGS_LEX=1)
 LFLAGS:=
 else
 WARNINGS_LEX_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten sus warnings (WARNINGS_LEX=0), como ser -w (para suprimir todos los mensajes de warning)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando se deshabiliten sus warnings (WARNINGS_LEX=0), como ser -w (para suprimir todos los mensajes de warning)
 LFLAGS:=
 endif
 
@@ -88,11 +98,11 @@ endif
 DEBUG_CC?=1
 ifneq ($(DEBUG_CC),0)
 DEBUG_CC_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se habiliten sus símbolos de depuración (DEBUG_CC=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
-CFLAGS+=-g
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando se habiliten sus símbolos de depuración (DEBUG_CC=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
+CFLAGS+=-g3
 else
 DEBUG_CC_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a CC cuando se deshabiliten sus símbolos de depuración (DEBUG_CC=0)
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando se deshabiliten sus símbolos de depuración (DEBUG_CC=0)
 CFLAGS+=
 endif
 
@@ -102,13 +112,13 @@ endif
 DEBUG_YACC?=0
 ifneq ($(DEBUG_YACC),0)
 DEBUG_YACC_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se habiliten sus símbolos de depuración (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando se habiliten sus símbolos de depuración (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
 # 	Cuando se habiliten los símbolos de depuración de YACC (DEBUG_YACC=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=1
 else
 DEBUG_YACC_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a YACC cuando se deshabiliten sus símbolos de depuración (DEBUG_YACC=0)
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando se deshabiliten sus símbolos de depuración (DEBUG_YACC=0)
 YFLAGS+=
 # 	Cuando se deshabiliten los símbolos de depuración de YACC (DEBUG_YACC=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 C_YOBJFLAGS:=-DYYDEBUG=0
@@ -120,18 +130,19 @@ endif
 DEBUG_LEX?=0
 ifneq ($(DEBUG_LEX),0)
 DEBUG_LEX_ACTIVATION:=Si
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se habiliten sus símbolos de depuración (DEBUG_LEX=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando se habiliten sus símbolos de depuración (DEBUG_LEX=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+=-d
 else
 DEBUG_LEX_ACTIVATION:=No
-# 	Agregar acá las opciones que se le quieran pasar a LEX cuando se deshabiliten sus símbolos de depuración (DEBUG_LEX=0)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando se deshabiliten sus símbolos de depuración (DEBUG_LEX=0)
 LFLAGS+=
 endif
 
 # Agregar acá otras opciones que se le quieran pasar siempre a CC, YACC y LEX además de las opciones que ya están, según corresponda
 CFLAGS+=-std=c99
 #	Para CC, por ejemplo:
-# 		- Opciones que controlan el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
+# 		- Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
+#		- Opciones para controlar el formato de los mensajes de diagnóstico (warnings)
 YFLAGS+=--report=state --report=lookahead --report=itemset
 # 	Para YACC, por ejemplo, --report=state (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR), --report=lookahead (para incrementar la descripción del autómata con cada conjunto de tokens siguientes de cada regla sobre el archivo *.output generado), --report=itemset (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR), --report=lookahead (para incrementar la descripción del autómata con el conjunto completo de ítems derivados para cada estado, en lugar de solamente el denominado núcleo sobre el archivo *.output generado), etc.
 LFLAGS+=
@@ -338,11 +349,15 @@ endef
 # Define una secuencia de comandos enlatada que muestra una nota en las ventanas de las sesiones abiertas de tmux (Terminal MUltipleXer)
 define nota_tmux
 	printf \"NOTA: Esta es una ventana de una sesion abierta de tmux (Terminal MUltipleXer)\n\" ; \
-	printf \"  * Para cerrar la ventana de la sesion, presione <CTRL+b>, seguidamente presione <x> y por ultimo presione <y>\n\" ; \
-	printf \"  * Para apartar la sesion con sus ventanas sin cerrarla [detach], presione <CTRL+b> y seguidamente presione <d>\n\" ; \
-	printf \"  * Para alternar entre las sesiones abiertas de tmux, presione <CTRL+b> y seguidamente presione <s>\n\" ; \
-	printf \"  * Para alternar entre las ventanas de las sesiones abiertas de tmux, presione <CTRL+b> y seguidamente presione <w>\n\" ; \
-	printf \"  * Para iniciar el modo desplazamiento por la ventana, presione <CTRL+b> y seguidamente presione <[> . Para finalizarlo, presione <q>\n\" ;
+	printf \"  * Para cerrar la ventana de la sesion, presione <Ctrl>+<b>, seguidamente presione <x> y por ultimo presione <y>\n\" ; \
+	printf \"  * Para apartar la sesion con sus ventanas sin cerrarla [detach], presione <Ctrl>+<b> y seguidamente presione <d>\n\" ; \
+	printf \"  * Para alternar entre las sesiones abiertas de tmux, presione <Ctrl>+<b> y seguidamente presione <s>\n\" ; \
+	printf \"  * Para alternar entre las ventanas de las sesiones abiertas de tmux, presione <Ctrl>+<b> y seguidamente presione <w>\n\" ; \
+	printf \"  * Para iniciar el modo desplazamiento por la ventana, presione <Ctrl>+<b> y seguidamente presione <[>\n\" ; \
+	printf \"     \t(con la distribucion de teclado latinoamericano, <[> es <Shift>+<{>)\n\" ; \
+	printf \"  * Para finalizar el modo desplazamiento por la ventana, presione <q>\n\" ; \
+	printf \"\nPresione <Enter> para continuar...\n\" ; \
+	read ;
 endef
 
 # Para eliminar la lista de sufijos conocidos que make genera por defecto
