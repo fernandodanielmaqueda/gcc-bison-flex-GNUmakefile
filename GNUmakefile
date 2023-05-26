@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.25-003-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.25-004-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
