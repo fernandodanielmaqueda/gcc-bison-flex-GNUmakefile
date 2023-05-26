@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.25-004-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.26-001-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -7,7 +7,7 @@
 # This is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.
 
-# Nombre del proyecto
+# Nombre del proyecto/programa/binario
 PROGRAM:=miproyecto
 
 # Subdirectorio en el que están ubicados los archivos *.h, *.c, *.y, y *.l fuente (excepto los archivos intermedios generados por CC, YACC y LEX). Por ejemplo: src/
@@ -371,15 +371,31 @@ endef
 # Para que make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
 .DELETE_ON_ERROR:
 
+# A partir de aquí se configura para el solamente imprimir los objetivos que deben ser (re)construidos según se encuentre habilitado o deshabilitado
+# 	Por defecto el solamente imprimir los objetivos que deben ser (re)construidos está deshabilitado: en caso de que no se le defina un valor a PRINT al comando de make, es como si se le agregara PRINT=0
+# 	Si se quiere habilitar el solamente imprimir los objetivos que deben ser (re)construidos, se debe agregar PRINT=1 al comando de make. Por ejemplo: <make PRINT=1> y <make all PRINT=1>
+PRINT_TARGETS?=0
+ifneq ($(PRINT_TARGETS),0)
+$(info La variable PRINT_TARGETS del makefile tiene valor distinto de 0)
+$(info Por lo tanto solamente se imprimiran los objetivos que deben ser reconstruidos:)
+endif
+# Esto es útil para depurar el makefile y/o visualizar qué objetivos necesitan ser re(hechos) antes de que sean (re)construidos, ya sea porque no existen o porque han quedado obsoletos por modificaciones en los archivos fuente.
+
 # Acá se configura el 'make all' según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
 # 	Por defecto la regeneración de los archivos secundarios está habilitada
 REGENERATE_SECONDARY:=1
 ifneq ($(REGENERATE_SECONDARY),0)
 # 	Para construir todos los archivos intermedios y el binario ya sea con sus SRCDIR*.l y/o SRCDIR*.y como fuentes, o ya sea con sus SRCDIR*.c como fuentes. Se ejecuta con <make> (por ser la meta por defecto) o <make all>
-all: $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.c" "\1.tab.h" "\1.output" "\1.tab.o"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed 's?"\([^"]*\)\.lex\.yy\.o"?"\1.lex.yy.c" "\1.lex.yy.o"?g' ;)) $(call escapar_espacios,$(BINDIR)$(PROGRAM)$(EXEEXT))
+all: $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.c" "\1.tab.h" "\1.output" "\1.tab.o"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed 's?"\([^"]*\)\.lex\.yy\.o"?"\1.lex.yy.c" "\1.lex.yy.o"?g' ;)) $(call escapar_espacios,$(BINDIR)$(PROGRAM)$(EXEEXT)) ;
+ifneq ($(PRINT_TARGETS),0)
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 else
 # 	Para construir el binario ya sea con sus SRCDIR*.l y/o SRCDIR*.y como fuentes, o ya sea con sus SRCDIR*.c como fuentes. Se ejecuta con <make> (por ser la meta por defecto) o <make all>
-all: $(call escapar_espacios,$(BINDIR)$(PROGRAM)$(EXEEXT))
+all: $(call escapar_espacios,$(BINDIR)$(PROGRAM)$(EXEEXT)) ;
+ifneq ($(PRINT_TARGETS),0)
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 # 	Define explícitamente determinados objetivos como archivos secundarios; estos son tratados como archivos intermedios (aquellos que son creados por regla prerequisito de otra regla), excepto que nunca son eliminados automáticamente al terminar
 .SECONDARY: $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.c" "\1.output" "\1.tab.o"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed 's?"\([^"]*\)\.lex\.yy\.o"?"\1.lex.yy.c" "\1.lex.yy.o"?g' ;))
 endif
@@ -389,6 +405,7 @@ GNUmakefile:: ;
 
 # Regla explícita para ejecutar el binario que se construye desde la misma ventana
 run:
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n=================[ Ejecutar el binario en esta ventana ]=================\n"
 	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
@@ -402,9 +419,13 @@ run:
 	fi ;
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 
 # Regla explícita para abrir el binario que se construye en una ventana nueva
 open:
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n=================[ Ejecutar el binario en una ventana nueva ]=================\n"
 	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
@@ -431,9 +452,13 @@ open:
 	fi ;
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 
 # Regla explícita para borrar todos los archivos intermedios y el binario generados al construir
 clean:
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n=================[ Eliminar todo lo que se genera al construir ]=================\n"
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_BINDIR)" ]; then \
 		if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
@@ -555,9 +580,13 @@ clean:
 		printf "<<< Realizado >>>\n" ; \
 	fi ;
 	@printf "\n=================[ Finalizado ]=============\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 
 # Regla explícita para depurar el binario que se construye desde la misma ventana por medio de una interfaz de línea de comandos (CLI)
 cli_bin_debug_run:
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n=================[ Depurar el binario en esta ventana por medio de una interfaz de linea de comandos (CLI) ]=================\n"
 	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
@@ -574,9 +603,13 @@ cli_bin_debug_run:
 	fi ;
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 
 # Regla explícita para depurar el binario que se construye en una ventana nueva por medio de una interfaz de línea de comandos (CLI)
 cli_bin_debug_open:
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n=================[ Depurar el binario en una ventana nueva por medio de una interfaz de linea de comandos (CLI) ]=================\n"
 	@printf "\n<<< \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_BINDIR)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
@@ -606,6 +639,9 @@ cli_bin_debug_open:
 	fi ;
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$@"
+endif
 
 # Para incluir el/los otro/s makefile/s ya producido/s con los prerequisitos generados automáticamente
 sinclude $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.d"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.tab.d"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.lex.yy.d"?g' ;))
@@ -616,6 +652,7 @@ empty: ;
 
 # Regla implícita de tipo regla de patrón con CC: Para construir el binario $(BINDIR)$(PROGRAM)$(EXEEXT)
 $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(BINDIR)$(PROGRAM)$(EXEEXT))): $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(YOBJS)) $(call sin_necesidad_de_comillas_dobles,$(LOBJS)) | $(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_BINDIR)
+ifeq ($(PRINT_TARGETS),0)
 # 	Anuncia que se va a iniciar la construcción
 	@printf "\n=================[ Construccion con $(CC): \"%s\" ]=================\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 # 	Si el binario ya existiera, fuerza su eliminación por si el archivo está en uso, ya que esto impediría su construcción
@@ -631,6 +668,9 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 	@printf "\n=================[ Finalizado ]=================\n"
 # 	Muestra una nota si hay YACC y si su depuración está habilitada
 	@$(call mostrar_nota_sobre_yacc_si_su_depuracion_esta_habilitada)
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Para habilitar una segunda expansión en los prerequisitos para todas las reglas que siguen a continuación
 .SECONDEXPANSION:
@@ -638,6 +678,7 @@ $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(
 
 # Regla implícita de tipo regla de patrón con YACC + CC: Para generar el archivo objeto $(OBJDIR)%.tab.o desde $(OBJDIR)%.tab.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(OBJDIR)%.tab.c) $$(call escapar_espacios,$$(SRCDIR)%.y) $$(call escapar_espacios,$$(DEPDIR)%.tab.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(PRINT_TARGETS),0)
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(YACC)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
@@ -645,18 +686,26 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(O
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_YOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Regla implícita de tipo regla de patrón con YACC: Para generar los archivos del analizador sintáctico (parser) $(OBJDIR)%.tab.c, $(OBJDIR)%.tab.h y $(OBJDIR)%.tab.output desde $(SRCDIR)%.y
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.h $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.output: $$(call escapar_espacios,$$(SRCDIR)%.y) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n<<< $(YACC): Generando los archivos del analizador sintactico (parser): \"%s\" [WARNINGS_YACC: $(WARNINGS_YACC_ACTIVATION) | DEBUG_YACC: $(DEBUG_YACC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1<.tab.c><.tab.h><.output>?' ;))"
 	@$(call sh_existe_comando,$(YACC))
 	@$(call sh_ruta_comando,$(YACC))
 	@printf "** Version instalada de $(YACC): %s **\n" "$$($(YACC) --version | sed -n 1p 2>/dev/null)"
 	$(YACC) -d -v $(YFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.tab.c?' ;))" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Regla implícita de tipo regla de patrón con LEX + CC: Para generar el archivo objeto $(OBJDIR)%.lex.yy.o desde $(OBJDIR)%.lex.yy.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(SRCDIR)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(YDEFS))
+ifeq ($(PRINT_TARGETS),0)
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(LEX)->$(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
@@ -664,18 +713,26 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_LOBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Regla implícita de tipo regla de patrón con LEX: Para generar el archivo del analizador léxico (scanner) $(OBJDIR)%.lex.yy.c desde $(SRCDIR)%.l
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.c: $$(call escapar_espacios,$$(SRCDIR)%.l) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n<<< $(LEX): Generando el archivo del analizador lexico (scanner): \"%s\" [WARNINGS_LEX: $(WARNINGS_LEX_ACTIVATION) | DEBUG_LEX: $(DEBUG_LEX_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(LEX))
 	@$(call sh_ruta_comando,$(LEX))
 	@printf "** Version instalada de $(LEX): %s **\n" "$$($(LEX) --version | sed -n 1p 2>/dev/null)"
 	$(LEX) $(LFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Regla implícita de tipo regla de patrón con CC: Para generar el archivo objeto $(OBJDIR)%.o desde $(SRCDIR)%.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(SRCDIR)%.c) $$(call escapar_espacios,$$(DEPDIR)%.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(PRINT_TARGETS),0)
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(CC): Generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_existe_comando,$(CC))
@@ -683,6 +740,9 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(SRCDI
 	@printf "** Version instalada de $(CC): %s **\n" "$$($(CC) --version | sed -n 1p 2>/dev/null)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_COBJFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
 
 # Regla implícita de tipo regla de patrón con una receta vacía que no hace nada: Para evitar errores al momento de incluir los otros makefiles con prerequisitos generados automáticamente, respecto de los objetivos $(DEPDIR)%.d , $(DEPDIR)%.tab.d y $(DEPDIR)%.lex.yy.d , los cuales son creados como efecto secundario de las recetas para los objetivos $(OBJDIR)%.o , $(OBJDIR)%.tab.o y $(OBJDIR)%.lex.yy.o respectivamente: si el objetivo no existe la receta vacía asegura de que make no reclamará sobre que no sabe cómo construir el objetivo, y sólo asumirá de que el objetivo está obsoleto
 %.d: ;
@@ -692,6 +752,10 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(SRCDI
 
 # Regla explícita con objetivos independientes para crear los directorios en donde se ubican los archivos intermedios, el binario, y los makefiles producidos correspondientemente, si alguno no existiera
 $(call escapar_simbolos_de_porcentaje_conforme_a_make,$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)) $(call escapar_simbolos_de_porcentaje_conforme_a_make,$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_BINDIR)) $(call escapar_simbolos_de_porcentaje_conforme_a_make,$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR)):
+ifeq ($(PRINT_TARGETS),0)
 	@printf "\n<<< Creando el directorio: \"%s\" >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	mkdir -p "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@printf "<<< Realizado >>>\n"
+else
+	@printf "  * Se debe (re)construir el objetivo '%s'.\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+endif
