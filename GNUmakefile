@@ -57,7 +57,7 @@ WARNINGS_CC_ACTIVATION:=Si
 #		-Wno-unused-function (para que NO muestre un warning cuando una función con static como especificador de clase de almacenamiento es declarada pero no definida o que no es utilizada)
 #		-Wno-unused-but-set-variable (para que NO muestre un warning cuando una variable local es inicializada pero no es utilizada)
 #		-Wno-unused-variable (para que NO muestre un warning cuando una variable local o con static como especificador de clase de almacenamiento es declarada no es utilizada)
-CFLAGS:=-Wall -Wpedantic -pedantic-errors
+CFLAGS:=-Wall -Wpedantic
 else
 WARNINGS_CC_ACTIVATION:=No
 # 	Agregar a continuación las opciones que se le quieran pasar a CC cuando se deshabiliten sus warnings (WARNINGS_CC=0), como ser -w (para no mostrar ningún warning)
