@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.26-001-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.27-001-pre
 # Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para obtener más información visite el repositorio <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -10,13 +10,13 @@
 # Nombre del proyecto/programa/binario
 PROGRAM:=miproyecto
 
-# Subdirectorio en el que están ubicados los archivos *.h, *.c, *.y, y *.l fuente (excepto los archivos intermedios generados por CC, YACC y LEX). Por ejemplo: src/
+# Subdirectorio en el que están ubicados los archivos *.h, *.c, *.y, y *.l fuente (excepto los archivos intermedios generados por CC, YACC y LEX). O sino puede quedar vacío para que se utilice el directorio actual. Por defecto: src/
 SRCDIR:=src/
-# Subdirectorio en el que se ubicarán los archivos intermedios generados por CC, YACC y LEX. Por ejemplo: obj/
+# Subdirectorio en el que se ubicarán los archivos intermedios generados por CC, YACC y LEX. No puede quedar vacío para que se utilice el directorio actual. Por defecto: obj/
 OBJDIR:=obj/
-# Subdirectorio en el que se ubicará el binario construido. Por ejemplo: bin/
+# Subdirectorio en el que se ubicará el binario construido. No puede quedar vacío para que se utilice el directorio actual. Por defecto: bin/
 BINDIR:=bin/
-# Subdirectorio en el que se ubicarán los otros makefiles (archivos *.d) producidos con las dependencias generadas automáticamente. Por ejemplo: .deps/
+# Subdirectorio en el que se ubicarán los otros makefiles (archivos *.d) producidos con las dependencias generadas automáticamente. No puede quedar vacío para que se utilice el directorio actual. Por defecto: .deps/
 DEPDIR:=.deps/
 
 # Compilador de C, generador de analizadores sintácticos (parsers) y generador de analizadores léxicos (scanners) a usar, respectivamente
@@ -31,6 +31,7 @@ GDBFLAGS:=
 # Agregar acá las opciones que controlan el preprocesador del lenguaje C
 CPPFLAGS=-I"$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" -I"$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"
 # 	Por ejemplo, aquí se ingresan las opciones -I"Directorio" para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
+#
 
 # Agregar acá las opciones para enlazar
 #	Por ejemplo, añadir las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, las cuales este a su vez se los pasa al enlazador ld y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
@@ -266,8 +267,21 @@ $(foreach variable,OBJDIR DEPDIR,$(eval SINGLE-QUOTES-ESCAPED_$(variable):=$$(ca
 # Define nuevas variables a partir de otras ya existentes pero con secuencias de escape para los espacios y con secuencias de escape para los símbolos de porcentaje conforme a make para que sus valores puedan sean utilizados directamente en los objetivos de determinadas reglas de make
 $(foreach variable,OBJDIR DEPDIR,$(eval PERCENT-SIGNS-AND-SPACES-ESCAPED_$(variable):=$$(call escapar_espacios,$$(call escapar_simbolos_de_porcentaje_conforme_a_make,$$($$(variable))))))
 
+# Define nuevas variables a partir de otras ya existentes pero sin sus barras traseras y con secuencias de escape para los signos de pesos conforme a la shell para que sus valores puedan sean utilizados directamente en las comprobaciones de que no existan archivos con los mismos nombres de los directorios
+$(foreach variable,OBJDIR BINDIR DEPDIR,$(eval TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(variable):=$$(call escapar_simbolo_pesos_conforme_a_shell,$$(shell printf "%s" "$$(DOLLAR-SIGNS-ESCAPED_$$(variable))" | sed 's?/$$$$??' ;))))
+
 # Define nuevas variables a partir de otras ya existentes pero sin sus barras traseras y con secuencias de escape para los espacios para que sus valores puedan sean utilizados directamente en los prerequisitos de sólo orden de determinadas reglas de make
 $(foreach variable,OBJDIR BINDIR DEPDIR,$(eval TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_$(variable):=$$(call escapar_espacios,$$(shell printf "%s" "$$(DOLLAR-SIGNS-ESCAPED_$$(variable))" | sed 's?/$$$$??' ;))))
+
+# Comprueba que no existan archivos con los mismos nombres de los directorios, ya que no puede existir un directorio con el mismo nombre de un archivo, debido a que no se los podría diferenciar entre sí
+define make_comprobar_que_no_exista_archivo_con_el_nombre_del_directorio
+ifneq ($($(1)),)
+ifneq ($$(shell if [ -f "$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))" ]; then echo foo ; fi ;),)
+$$(error ERROR: El archivo '$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))' tiene el mismo nombre que el directorio definido en la variable $(1) del makefile: debe elimininarlo, moverlo o renombrarlo manualmente para poder continuar)
+endif
+endif
+endef
+$(foreach variable,OBJDIR BINDIR DEPDIR,$(eval $(call make_comprobar_que_no_exista_archivo_con_el_nombre_del_directorio,$(variable))))
 
 # Produce los nombres de todos los archivos objeto a generar de acuerdo con los archivos fuente de C ($(SRCDIR)*.c), YACC ($(SRCDIR)*.y) y LEX ($(SRCDIR)*.l) que se encuentren, respectivamente
 COBJS:=$(shell ls "$(DOLLAR-SIGNS-ESCAPED_SRCDIR)"*.c 2>/dev/null | sed -e 's?.*/??' -e 's?\(.*\)\.c?"$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.o"?' ;)
@@ -354,7 +368,7 @@ define nota_tmux
 	printf \"  * Para alternar entre las sesiones abiertas de tmux, presione <Ctrl>+<b> y seguidamente presione <s>\n\" ; \
 	printf \"  * Para alternar entre las ventanas de las sesiones abiertas de tmux, presione <Ctrl>+<b> y seguidamente presione <w>\n\" ; \
 	printf \"  * Para iniciar el modo desplazamiento por la ventana, presione <Ctrl>+<b> y seguidamente presione <[>\n\" ; \
-	printf \"     \t(con la distribucion de teclado latinoamericano, <[> es <Shift>+<{>)\n\" ; \
+	printf \"     (con la distribucion de teclado latinoamericano, <[> es <Shift>+<{>)\n\" ; \
 	printf \"  * Para finalizar el modo desplazamiento por la ventana, presione <q>\n\" ; \
 	printf \"\nPresione <Enter> para continuar...\n\" ; \
 	read ;
@@ -372,7 +386,7 @@ endef
 .DELETE_ON_ERROR:
 
 # A partir de aquí se configura para el solamente imprimir los objetivos que deben ser (re)construidos según se encuentre habilitado o deshabilitado
-# 	Por defecto el solamente imprimir los objetivos que deben ser (re)construidos está deshabilitado: en caso de que no se le defina un valor a PRINT al comando de make, es como si se le agregara PRINT=0
+# 	Por defecto el solamente imprimir los objetivos que deben ser (re)construidos se deshabilita: en caso de que no se le defina un valor a PRINT al comando de make, es como si se le agregara PRINT=0
 # 	Si se quiere habilitar el solamente imprimir los objetivos que deben ser (re)construidos, se debe agregar PRINT=1 al comando de make. Por ejemplo: <make PRINT=1> y <make all PRINT=1>
 PRINT_TARGETS?=0
 ifneq ($(PRINT_TARGETS),0)
@@ -382,8 +396,9 @@ endif
 # Esto es útil para depurar el makefile y/o visualizar qué objetivos necesitan ser re(hechos) antes de que sean (re)construidos, ya sea porque no existen o porque han quedado obsoletos por modificaciones en los archivos fuente.
 
 # Acá se configura el 'make all' según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
-# 	Por defecto la regeneración de los archivos secundarios está habilitada
-REGENERATE_SECONDARY:=1
+# 	Por defecto la regeneración de los archivos secundarios se habilita: en caso de que no se le defina un valor a REGENERATE_SECONDARY al comando de make, es como si se le agregara REGENERATE_SECONDARY=1
+# 	Si se quiere deshabilitar la regeneración de los archivos secundarios, se debe agregar REGENERATE_SECONDARY=0 al comando de make. Por ejemplo: <make REGENERATE_SECONDARY=0> y <make all REGENERATE_SECONDARY=0>
+REGENERATE_SECONDARY?=1
 ifneq ($(REGENERATE_SECONDARY),0)
 # 	Para construir todos los archivos intermedios y el binario ya sea con sus SRCDIR*.l y/o SRCDIR*.y como fuentes, o ya sea con sus SRCDIR*.c como fuentes. Se ejecuta con <make> (por ser la meta por defecto) o <make all>
 all: $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.c" "\1.tab.h" "\1.output" "\1.tab.o"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed 's?"\([^"]*\)\.lex\.yy\.o"?"\1.lex.yy.c" "\1.lex.yy.o"?g' ;)) $(call escapar_espacios,$(BINDIR)$(PROGRAM)$(EXEEXT)) ;
