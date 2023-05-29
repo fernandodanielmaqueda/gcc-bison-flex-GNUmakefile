@@ -28,36 +28,40 @@ LEX:=flex
 GDB:=gdb
 GDBFLAGS:=
 
+# Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes (entre los que están C, C++, Objetive C, etc.). En este proyecto estas opciones sólo serían para CC, porque C es el único lenguaje de entre ellos que se utiliza para este programa. En cambio, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C en las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS
+CPPFLAGS=-I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)" -I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)"
+# Entre las opciones que controlan el preprocesador, se encuentran:
+# 	-I"Directorio" (para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>))
+#	-DNombre (para predefinir Nombre como una macro, con definición 1)
+#	-DNombre=Definición (para predefinir Nombre como una macro, dada Definición)
+#	-UNombre (para cancelar cualquier definición previa de Nombre, ya sea integrada o provista con una opción -D)
+
 # Agregar acá las opciones PRINCIPALES que SIEMPRE se le quieran pasar a CC, YACC y LEX, según corresponda. Observar que también se les pueden agregar otras opciones según se encuentren las advertencias (warnings) y/o las depuraciones (debug) habilitadas o deshabilitadas, y aún más para el caso particular CC dependiendo del archivo objeto que se vaya a (re)generar
-# Tener en cuenta que al respecto de CC, se espera que las opciones que controlan el preprocesador de C sean agregadas en la variable CPPFLAGS, y que las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan
-CFLAGS:=-std=c99
+# Se espera, al respecto de CC, que las opciones que controlan el preprocesamiento que sean/serían SOLAMENTE para el preprocesador de C se añadan en las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS (caso contrario en la variable CPPFLAGS), y que TODAS las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan 
+CFLAGS=-std=c99 -O0
 #	Para CC, por ejemplo:
 # 		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
 #		+ Opciones para controlar el formato de los mensajes de diagnóstico (warnings)
 #		+ Opciones que controlan la optimización: entre ellas, -O, -O1, -O2, -O3, -O0, Os, -Ofast, -Og, -Oz, etc. 
-YFLAGS:=--report=state --report=lookahead --report=itemset
+YFLAGS=--report=state --report=lookahead --report=itemset
 # 	Para YACC, por ejemplo:
 #		+ Opciones que controlan la salida de los archivos .output: entre ellas,
 #			--report=state (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR)
 #			--report=itemset (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR)
 #			--report=lookahead (para incrementar la descripción del autómata con el conjunto completo de ítems derivados para cada estado, en lugar de solamente el denominado núcleo sobre el archivo *.output generado), etc.
-LFLAGS:=
+LFLAGS=
 
 # Agregar acá otras opciones que se le quieran pasar siempre a CC EXCLUSIVAMENTE al (re)generar los archivos objeto desde los de C fuentes (de *.c a *.o), desde los archivos de C generados por YACC (de *.tab.c a *.tab.o) y desde los archivos de C generados por LEX (de *.lex.yy.c a *.lex.yy.o), según corresponda
-C_COBJFLAGS:=
-C_YOBJFLAGS:=
-C_LOBJFLAGS:=
-
-# Agregar acá las opciones para el preprocesador de C y para los programas que lo utilizan (entre los que está CC)
-CPPFLAGS=-I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)" -I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)"
-# 	Por ejemplo, aquí se pueden ingresar las opciones -I"Directorio" para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>)
+COBJS_CFLAGS=
+YOBJS_CFLAGS=
+LOBJS_CFLAGS=
 
 # Agregar acá las opciones para enlazar
 #	Por ejemplo, añadir las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, las cuales este a su vez se los pasa al enlazador ld y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
 # 	Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
 # 	Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/makefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
-LDFLAGS:=
-LDLIBS:=-lm
+LDFLAGS=
+LDLIBS=-lm
 # 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este makefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
 # 	Más abajo se agregan -lfl y -ly para incluir las bibliotecas libfl.a y liby.a para LEX y YACC según sea necesario. Si el compilador no encontrara alguno de esos archivos, se los debe indicar manualmente añadiendo las opciones -L correspondientes en LDFLAGS.
 
@@ -135,13 +139,13 @@ DEBUG_YACC_ACTIVATION:=Si
 # 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando su depuración (debug) se encuentre habilitada (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
 # 	Cuando la depuración (debug) de YACC se encuentre habilitada (DEBUG_YACC=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
-C_YOBJFLAGS+=-DYYDEBUG=1
+YOBJS_CFLAGS+=-DYYDEBUG=1
 else
 DEBUG_YACC_ACTIVATION:=No
 # 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando su depuración (debug) se encuentre habilitada (DEBUG_YACC=0)
 YFLAGS+=
 # 	Cuando la depuración (debug) de YACC se encuentre deshabilitada (DEBUG_YACC=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
-C_YOBJFLAGS+=-DYYDEBUG=0
+YOBJS_CFLAGS+=-DYYDEBUG=0
 endif
 
 # Acá se configuran las opciones para la depuración (debug) de LEX al (re)generar los archivos del analizador léxico (scanner), según se encuentre habilitada o deshabilitada
@@ -380,7 +384,7 @@ define sh_mostrar_nota_sobre_tmux
 	printf \"  * Para iniciar el modo desplazamiento por la ventana, presione <Ctrl>+<b> y seguidamente presione <[>\n\" ; \
 	printf \"     (con la distribucion de teclado latinoamericano, <[> es <Shift>+<{>)\n\" ; \
 	printf \"  * Para finalizar el modo desplazamiento por la ventana, presione <q>\n\" ; \
-	printf \"\nPresione <Enter> para continuar...\n\" ; \
+	printf \"\nPresione <Enter> para continuar...\" ; \
 	read
 endef
 
@@ -690,7 +694,7 @@ else
 	@$(call sh_forzar_eliminacion_si_ya_existiera_el_binario,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
 	@printf "\n<<< $(CC)->$(CC): Enlazando todos los archivos objeto con las bibliotecas para (re)construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS)) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS)) $(LDLIBS)
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=================\n"
 	@$(call sh_mostrar_nota_sobre_yacc_si_su_depuracion_se_encuentra_habilitada)
@@ -708,7 +712,7 @@ else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(YACC)->$(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	$(CC) $(CFLAGS) $(C_YOBJFLAGS) $(CPPFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(YOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 endif
 
@@ -731,7 +735,7 @@ else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(LEX)->$(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	$(CC) $(CFLAGS) $(C_LOBJFLAGS) $(CPPFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 endif
 
@@ -754,7 +758,7 @@ else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
 	@printf "\n<<< $(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	$(CC) $(CFLAGS) $(C_COBJFLAGS) $(CPPFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(COBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
 endif
 
