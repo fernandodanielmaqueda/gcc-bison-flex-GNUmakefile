@@ -28,7 +28,7 @@ LEX:=flex
 GDB:=gdb
 GDBFLAGS:=
 
-# Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes (entre los que están C, C++, Objetive C, etc.). En este proyecto estas opciones sólo serían para CC, porque C es el único lenguaje de entre ellos que se utiliza para este programa. En cambio, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C en las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS
+# Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes (entre los que están C, C++, Objetive C, etc.). En este proyecto estas opciones sólo serán para CC, porque de entre esos lenguajes, C es el único utilizado para este programa. Por otra parte, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso
 CPPFLAGS=-I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)" -I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)"
 # Entre las opciones que controlan el preprocesador, se encuentran:
 # 	-I"Directorio" (para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>))
@@ -37,7 +37,7 @@ CPPFLAGS=-I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)" -I"$(if $(srcdir),
 #	-UNombre (para cancelar cualquier definición previa de Nombre, ya sea integrada o provista con una opción -D)
 
 # Agregar acá las opciones PRINCIPALES que SIEMPRE se le quieran pasar a CC, YACC y LEX, según corresponda. Observar que también se les pueden agregar otras opciones según se encuentren las advertencias (warnings) y/o las depuraciones (debug) habilitadas o deshabilitadas, y aún más para el caso particular CC dependiendo del archivo objeto que se vaya a (re)generar
-# Se espera, al respecto de CC, que las opciones que controlan el preprocesamiento que sean/serían SOLAMENTE para el preprocesador de C se añadan en las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS (caso contrario en la variable CPPFLAGS), y que TODAS las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan 
+# Se espera, al respecto de CC, que las opciones que controlan el preprocesamiento que sean/serían SOLAMENTE para el preprocesador de C se añadan entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso (de lo contrario en la variable CPPFLAGS), y que TODAS las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan 
 CFLAGS=-std=c99 -O0
 #	Para CC, por ejemplo:
 # 		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
