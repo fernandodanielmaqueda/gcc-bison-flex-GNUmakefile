@@ -118,7 +118,7 @@ endif
 DEBUG_CC?=1
 ifneq ($(DEBUG_CC),0)
 DEBUG_CC_ACTIVATION:=Si
-# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando sus símbolos de depuración (debug symbols) se encuentren habilitados (DEBUG_CC=1), como ser -g (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse)
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando sus símbolos de depuración (debug symbols) se encuentren habilitados (DEBUG_CC=1), como ser -g[level] (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse), -ggdb[level] y -gvms[level], opciones en las cuales level (el nivel) indica la cantidad de información de depuración, pudiendo estar entre 0 (nada) y 3 (extra) y que por defecto (si no se especifica) es 2.
 CFLAGS+=-g3
 else
 DEBUG_CC_ACTIVATION:=No
@@ -450,14 +450,14 @@ else
 			$(RM) "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
-	fi ;
+	fi
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_bindir)" ]; then \
 		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)" ; \
 		set -x ; \
 			rmdir "$(DOLLAR-SIGNS-ESCAPED_bindir)" 2>/dev/null || true ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
 			for EXT in .lex.yy.o .lex.yy.c ; do \
@@ -470,7 +470,7 @@ else
 				fi ; \
 			done ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
 			for EXT in .tab.o .output .tab.h .tab.c ; do \
@@ -483,7 +483,7 @@ else
 				fi ; \
 			done ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
 		for COBJ in $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) ; do \
 			if [ -f "$$COBJ" ]; then \
@@ -494,14 +494,14 @@ else
 				printf "<<< Realizado >>>\n" ; \
 			fi ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ]; then \
 		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ; \
 		set -x ; \
 			rmdir "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" 2>/dev/null || true ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
 			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ]; then \
@@ -519,7 +519,7 @@ else
 				printf "<<< Realizado >>>\n" ; \
 			fi ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
 			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ]; then \
@@ -537,7 +537,7 @@ else
 				printf "<<< Realizado >>>\n" ; \
 			fi ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"\1"?g' ;)) ; do \
 			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ]; then \
@@ -555,14 +555,14 @@ else
 				printf "<<< Realizado >>>\n" ; \
 			fi ; \
 		done ; \
-	fi ;
+	fi
 	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ]; then \
 		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ; \
 		set -x ; \
 			rmdir "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" 2>/dev/null || true ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
-	fi ;
+	fi
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
 
@@ -582,7 +582,7 @@ else
 		printf "<<< Realizado >>>\n" ; \
 	else \
 		printf "\nEXCEPCION: No existe el binario \"%s\". Se lo debe construir para poder ejecutarlo...\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-	fi ;
+	fi
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
 
@@ -615,7 +615,7 @@ else
 		esac ; \
 	else \
 		printf "\nEXCEPCION: No existe el binario \"%s\". Se lo debe construir para poder ejecutarlo...\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-	fi ;
+	fi
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
 
@@ -636,7 +636,7 @@ else
 		printf "<<< Realizado >>>\n" ; \
 	else \
 		printf "\nEXCEPCION: No existe el binario \"%s\". Se lo debe construir para poder depurarlo...\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-	fi ;
+	fi
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
 
@@ -669,7 +669,7 @@ else
 		esac ; \
 	else \
 		printf "\nEXCEPCION: No existe el binario \"%s\". Se lo debe construir para poder depurarlo...\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-	fi ;
+	fi
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
@@ -690,7 +690,7 @@ else
 	@$(call sh_forzar_eliminacion_si_ya_existiera_el_binario,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
 	@printf "\n<<< $(CC)->$(CC): Enlazando todos los archivos objeto con las bibliotecas para (re)construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS))
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS)) $(LDLIBS)
 	@printf "<<< Realizado >>>\n"
 	@printf "\n=================[ Finalizado ]=================\n"
 	@$(call sh_mostrar_nota_sobre_yacc_si_su_depuracion_se_encuentra_habilitada)
