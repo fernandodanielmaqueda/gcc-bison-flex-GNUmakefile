@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.30-001-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.05.30-002-pre
 # Este GNUmakefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para conseguir más información y asegurarse de obtener la versión base original más reciente, visite el repositorio del proyecto <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -717,6 +717,7 @@ endif
 
 # Regla implícita de tipo regla de patrón con YACC + CC: Para (re)generar el archivo objeto $(OBJDIR)%.tab.o desde $(OBJDIR)%.tab.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.o: $$(call escapar_espacios,$$(OBJDIR)%.tab.c) $$(call escapar_espacios,$$(srcdir)%.y) $$(call escapar_espacios,$$(DEPDIR)%.tab.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(findstring t,$(firstword -$(MAKEFLAGS))),)
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
@@ -725,6 +726,10 @@ else
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(YOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+endif
+else
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.d?' ;))"
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 endif
 
 # Regla implícita de tipo regla de patrón con YACC: Para (re)generar los archivos del analizador sintáctico (parser) $(OBJDIR)%.tab.c, $(OBJDIR)%.tab.h y $(OBJDIR)%.tab.output desde $(srcdir)%.y
@@ -740,6 +745,7 @@ endif
 
 # Regla implícita de tipo regla de patrón con LEX + CC: Para (re)generar el archivo objeto $(OBJDIR)%.lex.yy.o desde $(OBJDIR)%.lex.yy.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.o: $$(call escapar_espacios,$$(OBJDIR)%.lex.yy.c) $$(call escapar_espacios,$$(srcdir)%.l) $$(call escapar_espacios,$$(DEPDIR)%.lex.yy.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR) $$(call sin_necesidad_de_comillas_dobles,$$(YDEFS))
+ifeq ($(findstring t,$(firstword -$(MAKEFLAGS))),)
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
@@ -748,6 +754,10 @@ else
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+endif
+else
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.d?' ;))"
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 endif
 
 # Regla implícita de tipo regla de patrón con LEX: Para (re)generar el archivo del analizador léxico (scanner) $(OBJDIR)%.lex.yy.c desde $(srcdir)%.l
@@ -763,6 +773,7 @@ endif
 
 # Regla implícita de tipo regla de patrón con CC: Para (re)generar el archivo objeto $(OBJDIR)%.o desde $(srcdir)%.c
 $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.o: $$(call escapar_espacios,$$(srcdir)%.c) $$(call escapar_espacios,$$(DEPDIR)%.d) | $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_DEPDIR) $$(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_OBJDIR)
+ifeq ($(findstring t,$(firstword -$(MAKEFLAGS))),)
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
@@ -771,6 +782,10 @@ else
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(COBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
+endif
+else
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.d?' ;))"
+	+touch "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 endif
 
 # Regla implícita de tipo regla de patrón con una receta vacía que no hace nada: Para evitar errores al momento de incluir los otros makefiles con prerequisitos producidos automáticamente, respecto de los objetivos $(DEPDIR)%.d , $(DEPDIR)%.tab.d y $(DEPDIR)%.lex.yy.d , los cuales son creados como efecto secundario de las recetas para los objetivos $(OBJDIR)%.o , $(OBJDIR)%.tab.o y $(OBJDIR)%.lex.yy.o respectivamente: si el objetivo no existe la receta vacía asegura de que make no reclamará sobre que no sabe cómo construir el objetivo, y sólo asumirá de que el objetivo está obsoleto
