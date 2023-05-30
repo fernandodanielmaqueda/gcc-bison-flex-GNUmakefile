@@ -1,5 +1,5 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.29-001-pre
-# Este makefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
+# gcc-bison-flex-GNUmakefile, versión 2023.05.30-001-pre
+# Este GNUmakefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para conseguir más información y asegurarse de obtener la versión base original más reciente, visite el repositorio del proyecto <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
 # Copyright (C) 2022-2023 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
@@ -59,14 +59,14 @@ LOBJS_CFLAGS=
 # Agregar acá las opciones para enlazar
 #	Por ejemplo, añadir las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, las cuales este a su vez se los pasa al enlazador ld y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
 # 	Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
-# 	Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/makefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
+# 	Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/GNUmakefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
 LDFLAGS=
 LDLIBS=-lm
-# 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este makefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
+# 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este GNUmakefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
 # 	Más abajo se agregan -lfl y -ly para incluir las bibliotecas libfl.a y liby.a para LEX y YACC según sea necesario. Si el compilador no encontrara alguno de esos archivos, se los debe indicar manualmente añadiendo las opciones -L correspondientes en LDFLAGS.
 
 # Acá se configuran las opciones para requerir o suprimir las advertencias (warnings) de CC al (re)generar los archivos objeto y/o al (re)construir el binario, según se encuentren habilitadas o deshabilitadas
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_CC=0 ó WARNINGS_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_CC=0 ó WARNINGS_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
 #	En caso de que no se lo indique, se habilitan ó deshabilitan de acuerdo con el valor definido por defecto para la variable WARNINGS_CC (si está escrito WARNINGS_CC?=1 ó WARNINGS_CC?=0 por ejemplo), debido a que si es distinto de 0 se habilitan, caso contrario se deshabilitan
 WARNINGS_CC?=1
 ifneq ($(WARNINGS_CC),0)
@@ -89,7 +89,7 @@ CFLAGS+=
 endif
 
 # Acá se configuran las opciones para las advertencias (warnings) de YACC al (re)generar los archivos del analizador sintáctico (parser), según se encuentren habilitadas o deshabilitadas
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_YACC=0 ó WARNINGS_YACC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_YACC=0>, <make all WARNINGS_YACC=0> y <make clean all WARNINGS_YACC=0>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_YACC=0 ó WARNINGS_YACC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_YACC=0>, <make all WARNINGS_YACC=0> y <make clean all WARNINGS_YACC=0>
 #	En caso de que no se lo indique, se habilitan ó deshabilitan de acuerdo con el valor definido por defecto para la variable WARNINGS_YACC (si está escrito WARNINGS_YACC?=1 ó WARNINGS_YACC?=0 por ejemplo), debido a que si es distinto de 0 se habilitan, caso contrario se deshabilitan
 WARNINGS_YACC?=1
 ifneq ($(WARNINGS_YACC),0)
@@ -103,7 +103,7 @@ YFLAGS+=
 endif
 
 # Acá se configuran las opciones para las advertencias (warnings) de LEX al (re)generar los archivos del analizador léxico (scanner), según se encuentren habilitadas o deshabilitadas
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_LEX=0 ó WARNINGS_LEX=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_LEX=0>, <make all WARNINGS_LEX=0> y <make clean all WARNINGS_LEX=0>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_LEX=0 ó WARNINGS_LEX=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_LEX=0>, <make all WARNINGS_LEX=0> y <make clean all WARNINGS_LEX=0>
 #	En caso de que no se lo indique, se habilitan ó deshabilitan de acuerdo con el valor definido por defecto para la variable WARNINGS_LEX (si está escrito WARNINGS_LEX?=1 ó WARNINGS_LEX?=0 por ejemplo), debido a que si es distinto de 0 se habilitan, caso contrario se deshabilitan
 WARNINGS_LEX?=1
 ifneq ($(WARNINGS_LEX),0)
@@ -117,7 +117,7 @@ LFLAGS+=
 endif
 
 # Acá se configuran los símbolos de depuración (debug symbols) de CC al (re)generar los archivos objeto y/o al (re)construir el binario, según se encuentren habilitados o deshabilitados
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarlos ó deshabilitarlos agregando DEBUG_CC=0 ó DEBUG_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlos: <make DEBUG_CC=0>, <make all DEBUG_CC=0> y <make clean all DEBUG_CC=0>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlos ó deshabilitarlos agregando DEBUG_CC=0 ó DEBUG_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlos: <make DEBUG_CC=0>, <make all DEBUG_CC=0> y <make clean all DEBUG_CC=0>
 #	En caso de que no se lo indique, se habilitan ó deshabilitan de acuerdo con el valor definido por defecto para la variable DEBUG_CC (si está escrito DEBUG_CC?=1 ó DEBUG_CC?=0 por ejemplo), debido a que si es distinto de 0 se habilitan, caso contrario se deshabilitan
 DEBUG_CC?=1
 ifneq ($(DEBUG_CC),0)
@@ -131,7 +131,7 @@ CFLAGS+=
 endif
 
 # Acá se configuran las opciones para la depuración (debug) de YACC al (re)generar los archivos del analizador sintáctico (parser) y/o al (re)generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o), según se encuentre habilitada o deshabilitada
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_YACC=0 ó DEBUG_YACC=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_YACC=1>, <make all DEBUG_YACC=1> y <make clean all DEBUG_YACC=1>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_YACC=0 ó DEBUG_YACC=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_YACC=1>, <make all DEBUG_YACC=1> y <make clean all DEBUG_YACC=1>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable DEBUG_YACC (si está escrito DEBUG_YACC?=1 ó DEBUG_YACC?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 DEBUG_YACC?=0
 ifneq ($(DEBUG_YACC),0)
@@ -149,7 +149,7 @@ YOBJS_CFLAGS+=-DYYDEBUG=0
 endif
 
 # Acá se configuran las opciones para la depuración (debug) de LEX al (re)generar los archivos del analizador léxico (scanner), según se encuentre habilitada o deshabilitada
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_LEX=0 ó DEBUG_LEX=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_LEX=1>, <make all DEBUG_LEX=1> y <make clean all DEBUG_LEX=1>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_LEX=0 ó DEBUG_LEX=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_LEX=1>, <make all DEBUG_LEX=1> y <make clean all DEBUG_LEX=1>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable DEBUG_LEX (si está escrito DEBUG_LEX?=1 ó DEBUG_LEX?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 DEBUG_LEX?=0
 ifneq ($(DEBUG_LEX),0)
@@ -188,7 +188,7 @@ define escapar_comillas_simples_dentro_de_otras_comillas_simples
 $(subst ','\'',$(1))
 endef
 
-# Para realizar las secuencias de escape para los símbolos de porcentaje conforme a make (cada % es reemplazado por \%) del valor pasado como parámetro
+# Para realizar las secuencias de escape para los símbolos de porcentaje conforme a GNU Make (cada % es reemplazado por \%) del valor pasado como parámetro
 define escapar_simbolos_de_porcentaje_conforme_a_make
 $(subst %,\%,$(1))
 endef
@@ -201,34 +201,39 @@ ifeq ($(wildcard $(call escapar_espacios,$(SHELL))),)
 $(error ERROR: no hay una shell sh instalada y/o no se ha podido encontrar y ejecutar)
 endif
 
-# Comprueba que la función $(shell ...) se ejecute correctamente. Una de las posibles causas por las que que falla es utilizar alguna de las opciones '-n', '--just-print', '--dry-run' y/o '--recon' al invocar a make, con las cuales se arroja un error similar al siguiente: process_begin: CreateProcess(NULL, "", ...) failed.
-ifeq ($(shell echo foo ;),)
-$(error ERROR: La funcion shell de GNU Make, necesaria para que pueda funcionar este makefile, no se puede ejecutar correctamente)
+# Comprueba que no se hayan agregado las opciones '-n', '--just-print', '--dry-run' y/o '--recon' al ejecutar este GNUmakefile con GNU Make, debido a que impiden la correcta ejecución de la función $(shell ...), necesaria para que este GNUmakefile pueda funcionar
+ifneq ($(findstring n,$(firstword -$(MAKEFLAGS))),)
+$(error ERROR: Este GNUmakefile no puede funcionar con las opciones '-n', '--just-print', '--dry-run' y/o '--recon' agregadas)
 endif
 
-# Define las rutas hacia los demás comandos a utilizar
+# Comprueba que la función $(shell ...) se ejecute correctamente. Una de las posibles causas por las que que falla es utilizar alguna de las opciones '-n', '--just-print', '--dry-run' y/o '--recon' al invocar a GNU Make, con las cuales se arroja un error similar al siguiente: process_begin: CreateProcess(NULL, "", ...) failed.
+ifeq ($(shell echo foo ;),)
+$(error ERROR: La funcion shell de GNU Make, necesaria para que este GNUmakefile pueda funcionar, no se ejecuta correctamente)
+endif
+
+# Define las rutas hacia algunos de los comandos a utilizar
+TMUX:=tmux
 MKDIR:=mkdir
 RM:=rm
-TMUX:=tmux
 
 # Comprueba que el comando <command> se pueda encontrar
 ifeq ($(shell command -v cd ;),)
-$(error ERROR: El comando <command>, necesario para que pueda funcionar este makefile, no esta instalado y/o no se puede encontrar y ejecutar)
+$(error ERROR: El comando <command>, necesario para que pueda funcionar este GNUmakefile, no esta instalado y/o no se puede encontrar y ejecutar)
 endif
 
-# Comprueba que se puedan encontrar todos los comandos necesarios que se presentan en GNU coreutils (Core Utilities)
+# Comprueba que se puedan encontrar aquellos de los comandos necesarios que SÍ se presentan en GNU coreutils (Core Utilities)
 define make_comprobar_comando_coreutils
-$(if $(shell command -v $(1) ;),,$(error ERROR: El comando <$(1)>, necesario para que pueda funcionar este makefile y que se presenta en GNU coreutils, no esta instalado y/o no se puede encontrar y ejecutar))
+$(if $(shell command -v $(1) ;),,$(error ERROR: El comando <$(1)>, necesario para que pueda funcionar este GNUmakefile y que se presenta en GNU coreutils, no esta instalado y/o no se puede encontrar y ejecutar))
 endef
 $(foreach comando,[ cat cp expr false ls $(MKDIR) mv printf pwd $(RM) rmdir test touch tr true uname,$(eval $(call make_comprobar_comando_coreutils,$(comando))))
 
-# Comprueba que se puedan encontrar el resto de los comandos necesarios
+# Comprueba que se puedan encontrar el resto de los comandos necesarios que NO se presentan en GNU coreutils (Core Utilities)
 define make_comprobar_otro_comando
-$(if $(shell command -v $(1) ;),,$(error ERROR: El comando <$(1)>, necesario para que pueda funcionar este makefile, no esta instalado y/o no se puede encontrar y ejecutar))
+$(if $(shell command -v $(1) ;),,$(error ERROR: El comando <$(1)>, necesario para que pueda funcionar este GNUmakefile, no esta instalado y/o no se puede encontrar y ejecutar))
 endef
 $(foreach comando,grep sed,$(eval $(call make_comprobar_otro_comando,$(comando))))
 
-# Define las opciones para los demás comandos a utilizar
+# Define las opciones para algunos de los comandos a utilizar
 RM:=$(RM) -f
 MKDIR_P:=$(MKDIR) -p
 
@@ -282,7 +287,7 @@ $(foreach variable,PROGRAM srcdir bindir DEPDIR OBJDIR,$(eval DOLLAR-SIGNS-ESCAP
 # Define nuevas variables a partir de otras ya existentes pero con secuencias de escape para las comillas simples para que sus valores puedan sean utilizados dentro de otras comillas simples
 $(foreach variable,DEPDIR OBJDIR,$(eval SINGLE-QUOTES-ESCAPED_$(variable):=$$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$$($$(variable)))))
 
-# Define nuevas variables a partir de otras ya existentes pero con secuencias de escape para los espacios y con secuencias de escape para los símbolos de porcentaje conforme a make para que sus valores puedan sean utilizados directamente en los objetivos de determinadas reglas de make
+# Define nuevas variables a partir de otras ya existentes pero con secuencias de escape para los espacios y con secuencias de escape para los símbolos de porcentaje conforme a GNU Make para que sus valores puedan sean utilizados directamente en los objetivos de determinadas reglas de make
 $(foreach variable,DEPDIR OBJDIR,$(eval PERCENT-SIGNS-AND-SPACES-ESCAPED_$(variable):=$$(call escapar_espacios,$$(call escapar_simbolos_de_porcentaje_conforme_a_make,$$($$(variable))))))
 
 # Define nuevas variables a partir de otras ya existentes pero sin sus barras traseras y con secuencias de escape para los signos de pesos conforme a la shell para que sus valores puedan sean utilizados directamente en las comprobaciones de que no existan archivos con los mismos nombres de los directorios
@@ -295,9 +300,9 @@ $(foreach variable,bindir DEPDIR OBJDIR,$(eval TRAILING-SLASH-REMOVED-AND-SPACES
 define make_comprobar_que_no_exista_archivo_con_el_nombre_del_directorio
 ifneq ($($(1)),)
 ifneq ($$(shell if [ -f "$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))" ]; then echo foo ; fi ;),)
-$$(info INFO: El archivo "$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))" tiene el mismo nombre que el del directorio definido en la variable $(1) del makefile, por lo tanto para poder continuar se procedera a eliminarlo...)
+$$(info INFO: El archivo "$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))" tiene el mismo nombre que el del directorio definido en la variable $(1) del GNUmakefile, por lo tanto para poder continuar se procedera a eliminarlo...)
 $$(shell $$(RM) "$$(TRAILING-SLASH-REMOVED-AND-DOLLAR-SIGNS-ESCAPED_$(1))" ;)
-$$(info Realizado.)
+$$(info ... realizado.)
 endif
 endif
 endef
@@ -324,7 +329,7 @@ endif
 else
 ifeq ($(COBJS),)
 # 	Alerta si no ha encontrado ningún archivo fuente de C ($(srcdir)*.c), YACC ($(srcdir)*.y) ni de LEX ($(srcdir)*.l)
-$(error ERROR: no se ha encontrado ningun archivo de $(CC) (*.c), $(YACC) (*.y) ni $(LEX) (*.l) en el directorio de ubicacion de archivos fuente definido en la variable srcdir del makefile: "$(srcdir)")
+$(error ERROR: no se ha encontrado ningun archivo de $(CC) (*.c), $(YACC) (*.y) ni $(LEX) (*.l) en el directorio de ubicacion de archivos fuente definido en la variable srcdir del GNUmakefile: "$(srcdir)")
 endif
 endif
 
@@ -407,20 +412,26 @@ endef
 .PHONY: all clean run open cli_bin_debug_run cli_bin_debug_open empty
 # 	La receta de una regla siempre se ejecutará si tiene como prerequisito de tipo normal a un target que sea .PHONY
 
-# Para que make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
+# Para que GNU Make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
 .DELETE_ON_ERROR:
 
 # A partir de aquí inicia la configuración para solamente imprimir los objetivos que deben ser (re)construidos así como sus dependencias que sean más recientes (todas si el objetivo no existe), según se encuentre habilitado o deshabilitado
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarlo ó deshabilitarlo agregando PRINT_ONLY=0 ó PRINT_ONLY=1 como opción, respectivamente. Por ejemplo, para habilitarlo: <make PRINT_ONLY=1> y <make all PRINT_ONLY=1>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlo ó deshabilitarlo agregando PRINT_ONLY=0 ó PRINT_ONLY=1 como opción, respectivamente. Por ejemplo, para habilitarlo: <make PRINT_ONLY=1> y <make all PRINT_ONLY=1>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable PRINT_ONLY (si está escrito PRINT_ONLY?=1 ó PRINT_ONLY?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
+# 	Como excepción, siempre se deshabilitará si se agregan las opciones '-t' y/o '--touch' al ejecutar este GNUmakefile con GNU Make, sin importar el valor definido para la variable PRINT_ONLY
 PRINT_ONLY?=0
 ifneq ($(PRINT_ONLY),0)
-$(info INFO: Se encuentra habilitado el solamente imprimir los objetivos que deben ser (re)construidos asi como sus dependencias que sean mas recientes (todas si el objetivo no existe), debido a que la variable PRINT_ONLY del makefile tiene definido un valor distinto de 0:)
+ifeq ($(findstring t,$(firstword -$(MAKEFLAGS))),)
+$(info INFO: Se encuentra habilitado el solamente imprimir los objetivos que deben ser (re)construidos asi como sus dependencias que sean mas recientes (todas si el objetivo no existe), debido a que la variable PRINT_ONLY del GNUmakefile tiene definido un valor distinto de 0...)
+else
+override PRINT_ONLY:=0
+$(info INFO: Como se ha agregado la opcion '-t' ó '--touch' al ejecutarse, se deshabilita el solamente imprimir los objetivos que deben ser (re)construidos asi como sus dependencias que sean mas recientes (todas si el objetivo no existe), por mas de que la variable PRINT_ONLY del GNUmakefile tenga definido un valor distinto de 0...)
 endif
-# Esto es útil para depurar el makefile y/o visualizar qué objetivos se (re)generarían al (re)construir, ya sea porque no existen o porque han quedado obsoletos por modificaciones en los archivos fuente, así como qué archivos han sido modificados desde la ultima (re)construccion.
+endif
+# Esto es útil para depurar el GNUmakefile y/o visualizar qué objetivos se (re)generarían al (re)construir, ya sea porque no existen o porque han quedado obsoletos por modificaciones en los archivos fuente, así como qué archivos han sido modificados desde la ultima (re)construccion.
 
 # Acá se configura el 'make all', según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
-#	Al ejecutar este makefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando REGENERATE_SECONDARY=0 ó REGENERATE_SECONDARY=1 como opción, respectivamente. Por ejemplo, para deshabilitarla: <make REGENERATE_SECONDARY=0> y <make all REGENERATE_SECONDARY=0>
+#	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando REGENERATE_SECONDARY=0 ó REGENERATE_SECONDARY=1 como opción, respectivamente. Por ejemplo, para deshabilitarla: <make REGENERATE_SECONDARY=0> y <make all REGENERATE_SECONDARY=0>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable REGENERATE_SECONDARY (si está escrito REGENERATE_SECONDARY?=1 ó REGENERATE_SECONDARY?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 REGENERATE_SECONDARY?=1
 ifneq ($(REGENERATE_SECONDARY),0)
@@ -439,7 +450,7 @@ endif
 .SECONDARY: $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed 's?"\([^"]*\)\.tab\.o"?"\1.tab.c" "\1.output" "\1.tab.o"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed 's?"\([^"]*\)\.lex\.yy\.o"?"\1.lex.yy.c" "\1.lex.yy.o"?g' ;))
 endif
 
-# Regla explícita que tiene como objetivo este mismo makefile para evitar que make intente reconstruirlo, ya que eso no es necesario, con lo cual se optimiza el tiempo de inicialización
+# Regla explícita que tiene como objetivo este mismo GNUmakefile para evitar que make intente reconstruirlo, ya que eso no es necesario, con lo cual se optimiza el tiempo de inicialización
 GNUmakefile:: ;
 
 # Regla explícita para borrar todos los archivos intermedios y el binario generados al construir
@@ -773,7 +784,7 @@ $(call escapar_simbolos_de_porcentaje_conforme_a_make,$(TRAILING-SLASH-REMOVED-A
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe construir el objetivo \"%s\".\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 else
-	@printf "\n<<< Creando el directorio: \"%s\" >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
-	$(MKDIR_P) "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
-	@printf "<<< Realizado >>>\n"
+	+@printf "\n<<< Creando el directorio: \"%s\" >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	+$(MKDIR_P) "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	+@printf "<<< Realizado >>>\n"
 endif
