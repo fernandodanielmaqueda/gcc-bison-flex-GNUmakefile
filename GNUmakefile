@@ -29,7 +29,7 @@ GDB:=gdb
 GDBFLAGS:=
 
 # Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes (entre los que están C, C++, Objetive C, etc.). En este proyecto estas opciones sólo serán para CC, porque de entre esos lenguajes, C es el único utilizado para este programa. Por otra parte, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso
-CPPFLAGS=-I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)" -I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)"
+CPPFLAGS=-I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)" -I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)"
 # Entre las opciones que controlan el preprocesador, se encuentran:
 # 	-I"Directorio" (para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>))
 #	-DNombre (para predefinir Nombre como una macro, con definición 1)
@@ -42,7 +42,7 @@ CFLAGS=-std=c99 -O0
 #	Para CC, por ejemplo:
 # 		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
 #		+ Opciones para controlar el formato de los mensajes de diagnóstico (warnings)
-#		+ Opciones que controlan la optimización: entre ellas, -O, -O1, -O2, -O3, -O0, Os, -Ofast, -Og, -Oz, etc. 
+#		+ Opciones que controlan la optimización: entre ellas, -O, -O1, -O2, -O3, -O0, Os, -Ofast, -Og, -Oz, etc.
 YFLAGS=--report=state --report=lookahead --report=itemset
 # 	Para YACC, por ejemplo:
 #		+ Opciones que controlan la salida de los archivos .output: entre ellas,
