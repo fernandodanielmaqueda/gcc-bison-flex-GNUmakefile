@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.05.30-002-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.06.01-001-pre
 # Este GNUmakefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para conseguir más información y asegurarse de obtener la versión base original más reciente, visite el repositorio del proyecto <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -28,27 +28,32 @@ LEX:=flex
 GDB:=gdb
 GDBFLAGS:=
 
-# Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes (entre los que están C, C++, Objetive C, etc.). En este proyecto estas opciones sólo serán para CC, porque de entre esos lenguajes, C es el único utilizado para este programa. Por otra parte, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso
+# Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes de programación (entre los que están C, C++, Objetive C, etc.). Por otra parte, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso
 CPPFLAGS=-I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)" -I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)"
 # Entre las opciones que controlan el preprocesador, se encuentran:
-# 	-I"Directorio" (para las búsquedas sobre directorios, las cuales sirven para indicar los directorios en donde se encuentran los archivos de cabecera (header files) (*.h) DEFINIDOS POR EL USUARIO de los que dependen los archivos de C (*.c), YACC (*.y), y/o LEX (*.l): es decir, sólo aquellos que están entre comillas dobles (""), como ser: #include "misfunciones.h"; no los que están entre corchetes angulares (<>), como #include <math.h>))
+# 	-I"Directorio" (es una de las opciones que sirven para especificar directorios para la búsqueda de archivos de cabecera (header files) (*.h): añade el directorio Directorio a la lista de directorios para buscar archivos de cabecera durante el preprocesamiento). Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. Por ejemplo, -I"include/"
+#		Existen dos formas para la directiva de preprocesamiento #include:
+#			(1) La que lleva corchetes angulares (angle-bracket form) (<>), como #include <math.h>
+#			(2) La que lleva comillas dobles (quoted form) (""), como ser: #include "misfunciones.h"
+#		Ambas formas hacen que la directiva #include sea reemplazada por todo el contenido del archivo de cabecera ó archivo fuente indicado en ella. La diferencia que hay entre ambas formas es el algoritmo de búsqueda utilizado para encontrar el archivo especificado; pero eso depende del compilador que se utilice, ya que es definido por la implementación. Pero los estándares también establecen, para la directiva que lleva comillas dobles (quoted form) (""), básicamente que si la búsqueda para esa forma no es soportada por el compilador, o si la búsqueda con ese algoritmo falla, entonces se debe pasar a buscar utilizando el algoritmo de búsqueda de la directiva que lleva corchetes angulares (angle-bracket form) (<>)
+#		Dicho eso, en general, la forma que lleva comillas dobles (quoted form) ("") prioriza los archivos del usuario por sobre los archivos del sistema, y la forma que lleva corchetes angulares (angle-bracket form) (<>) es utilizada para los archivos del sistema.
 #	-DNombre (para predefinir Nombre como una macro, con definición 1)
 #	-DNombre=Definición (para predefinir Nombre como una macro, dada Definición)
 #	-UNombre (para cancelar cualquier definición previa de Nombre, ya sea integrada o provista con una opción -D)
 
-# Agregar acá las opciones PRINCIPALES que SIEMPRE se le quieran pasar a CC, YACC y LEX, según corresponda. Observar que también se les pueden agregar otras opciones según se encuentren las advertencias (warnings) y/o las depuraciones (debug) habilitadas o deshabilitadas, y aún más para el caso particular CC dependiendo del archivo objeto que se vaya a (re)generar
-# Se espera, al respecto de CC, que las opciones que controlan el preprocesamiento que sean/serían SOLAMENTE para el preprocesador de C se añadan entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso (de lo contrario en la variable CPPFLAGS), y que TODAS las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan 
+# Agregar acá las opciones PRINCIPALES que SIEMPRE se le quieran pasar a CC, YACC y LEX, según corresponda. Notar que también se les pueden agregar otras opciones según se encuentren las advertencias (warnings) y/o las depuraciones (debug) habilitadas o deshabilitadas (de acuerdo los valores definidos para las variables WARNINGS_CC, WARNINGS_YACC, WARNINGS_LEX, DEBUG_CC, DEBUG_YACC y DEBUG_LEX), y para CC también de acuerdo con el archivo objeto que se vaya a (re)generar (establecido en las variables COBJS_CFLAGS, YOBJS_CFLAGS y LOBJS_CFLAGS)
+# 	Se espera, al respecto de CC, que las opciones que controlan el preprocesamiento que sean/serían SOLAMENTE para el preprocesador de C se añadan entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso (de lo contrario en la variable CPPFLAGS), y que TODAS las opciones para enlazar sean agregadas en las variables LDFLAGS ó LDLIBS según correspondan
 CFLAGS=-std=c99 -O0
 #	Para CC, por ejemplo:
-# 		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
+#		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
 #		+ Opciones para controlar el formato de los mensajes de diagnóstico (warnings)
 #		+ Opciones que controlan la optimización: entre ellas, -O, -O1, -O2, -O3, -O0, Os, -Ofast, -Og, -Oz, etc.
-YFLAGS=--report=state --report=lookahead --report=itemset
+YFLAGS=--report=state --report=itemset --report=lookahead
 # 	Para YACC, por ejemplo:
 #		+ Opciones que controlan la salida de los archivos .output: entre ellas,
-#			--report=state (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR)
-#			--report=itemset (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata LALR)
-#			--report=lookahead (para incrementar la descripción del autómata con el conjunto completo de ítems derivados para cada estado, en lugar de solamente el denominado núcleo sobre el archivo *.output generado), etc.
+#			--report=state (para que se incluya en el archivo *.output generado una descripción de la gramática, conflictos tanto resueltos como sin resolver, y el autómata del analizador sintáctico)
+#			--report=itemset (para que en el archivo *.output generado se muestren los estados y se incremente la descripción del autómata con el conjunto derivado para cada estado, en lugar de solamente su núcleo)
+#			--report=lookahead (para que en el archivo *.output generado se muestren los estados se incremente la descripción del autómata con el conjunto siguiente de cada regla)
 LFLAGS=
 
 # Agregar acá otras opciones que se le quieran pasar siempre a CC EXCLUSIVAMENTE al (re)generar los archivos objeto desde los de C fuentes (de *.c a *.o), desde los archivos de C generados por YACC (de *.tab.c a *.tab.o) y desde los archivos de C generados por LEX (de *.lex.yy.c a *.lex.yy.o), según corresponda
@@ -56,14 +61,20 @@ COBJS_CFLAGS=
 YOBJS_CFLAGS=
 LOBJS_CFLAGS=
 
-# Agregar acá las opciones para enlazar
-#	Por ejemplo, añadir las opciones -L (en LDFLAGS) y -l (en LDLIBS) para CC, las cuales este a su vez se los pasa al enlazador ld y sirven para enlazar con las bibliotecas necesarias (tanto estáticas (lib*.a) como dinámicas (lib*.so))
-# 	Esto se usa cuando el compilador no encuentra algún archivo de cabecera (header file) (*.h) DEL SISTEMA: es decir, sólo aquellos que están entre corchetes angulares (<>), como #include <math.h>; no los que están entre comillas dobles (""), como ser: #include "misfunciones.h")
-# 	Para eso poner -lNombreBiblioteca en LDLIBS (si el compilador ya puede encontrar por si solo el archivo libNombreBiblioteca.aÓ.so) y/o poner -L"ruta/relativa/desde/este/GNUmakefile/Ó/absoluta/hasta/un/directorio/que/contiene/archivos/libNombreBiblioteca.aÓ.so" en LDFLAGS y luego -lNombreBiblioteca en LDLIBS (para indicar la ubicación del archivo libNombreBiblioteca.aÓ.so manualmente).
+# Agregar acá las opciones para enlazar para CC
+#	Se espera que se añadan TODAS las opciones -lNombreBiblioteca en la variable LDLIBS, y el resto de las opciones en la variable LDFLAGS
+# 	Notar que ya se agregan las opciones -ly y -lfl para buscar y procesar las bibliotecas liby.a y libfl.a para YACC y LEX cuando se encuentran archivos fuente de YACC ($(srcdir)*.y) y LEX ($(srcdir)*.l) correspondientemente. Si el enlazador no pudiera encontrar alguna de esas bibliotecas, se las debe indicar manualmente añadiendo las opciones -L correspondientes en la variable LDFLAGS.
 LDFLAGS=
 LDLIBS=-lm
-# 	Por ejemplo, -lm para incluir la biblioteca libm.a la cual contiene <math.h>, <complex.h> y <fenv.h>; y -L"lib" -L"C:/Users/Mi Usuario/Documents/Ejemplo - Directorio_De_Mi_Proyecto (1)" para indicar, por ruta relativa (desde este GNUmakefile) y por ruta absoluta, respectivamente, dos directorios que contienen bibliotecas
-# 	Más abajo se agregan -lfl y -ly para incluir las bibliotecas libfl.a y liby.a para LEX y YACC según sea necesario. Si el compilador no encontrara alguno de esos archivos, se los debe indicar manualmente añadiendo las opciones -L correspondientes en LDFLAGS.
+# Entre las opciones para enlazar, se encuentran:
+#	-lNombreBiblioteca (son pasadas directamente al enlazador y sirven para buscar y procesar la biblioteca con NombreBiblioteca al enlazar). Por ejemplo, -lm para que se busque y procese la biblioteca libm.a la cual contiene archivos objeto con declaraciones y definiciones para el uso de las directivas #include <math.h>, #include <complex.h> e #include <fenv.h>
+#		Existen dos tipos de bibliotecas:
+#			(1) Estáticas (static): son archivos como "libNombreBiblioteca.a" que a su vez contienen archivos objeto (archivos *.o) 
+#			(2) Compartidas/Dinámicas (shared/dynamic): son archivos típicamente con la forma "libNombreBiblioteca.so"
+#		El enlazador busca en una lista estándar de directorios por la biblioteca con NombreBiblioteca. Los directorios en los que se busca incluye a varios directorios estándar del sistema sumado por cualquiera que se especifique con la opción -L
+#		No todos los objetivos (targets) -así es como denomina a los sistemas sobre los que se compila- soportan bibliotecas dinámicas, pero en aquellos en que sí: en el caso de que se encuentre tanto una biblioteca estática como una dinámica, el enlazador da preferencia a enlazar con la biblioteca dinámica a menos que se utilice la opción -static
+#		Importa el lugar del comando en el que se coloca esta opción; el enlazador busca y procesa bibliotecas y archivos objeto en el orden en el que éstos son especificados. Por ende, 'foo.o -lz bar.o' busca la biblioteca con nombre 'z' luego del archivo objeto 'foo.o' pero antes del archivo objeto 'bar.o'. Si 'bar.o' hace referencia a funciones que están en la biblioteca con nombre 'z', esas funciones podrían no ser cargadas
+#	-L"Directorio" (éstas opciones sirven para especificar directorios para la búsqueda de bibliotecas (archivos lib*.a y/o lib*.so): añade el directorio Directorio a la lista de directorios para las búsquedas con las opciones -l. Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. Por ejemplo, -L"lib/"
 
 # Acá se configuran las opciones para requerir o suprimir las advertencias (warnings) de CC al (re)generar los archivos objeto y/o al (re)construir el binario, según se encuentren habilitadas o deshabilitadas
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_CC=0 ó WARNINGS_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
@@ -319,17 +330,17 @@ YDEFS=$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comil
 # Acciones de acuerdo con los archivos fuente presentes en el proyecto
 ifneq ($(YOBJS)$(LOBJS),)
 ifneq ($(YOBJS),)
-# 	Agrega el flag -ly para CC (y este a su vez se lo pasa al enlazador ld) para que incluya la biblioteca liby.a para YACC, ya que es necesaria. Si el enlazador no pudiera encontrar ese archivo, se lo debe indicar manualmente añadiendo la opción -L correspondiente en LDFLAGS.
+# 	Agrega la opción -ly para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca liby.a la cual contiene declaraciones y definiciones necesarias para el enlace con YACC. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la variable LDFLAGS.
 LDLIBS+=-ly
 endif
 ifneq ($(LOBJS),)
-# 	Agrega el flag -lfl para CC (y este a su vez se lo pasa al enlazador ld) para que incluya la biblioteca libfl.a para LEX, ya que es necesaria. Si el enlazador no pudiera encontrar ese archivo, se lo debe indicar manualmente añadiendo la opción -L correspondiente en LDFLAGS.
+# 	Agrega la opción -lfl para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca libfl.a la cual contiene declaraciones y definiciones de LEX necesarias para el enlace con LEX. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la varible LDFLAGS.
 LDLIBS+=-lfl
 endif
 else
 ifeq ($(COBJS),)
 # 	Alerta si no ha encontrado ningún archivo fuente de C ($(srcdir)*.c), YACC ($(srcdir)*.y) ni de LEX ($(srcdir)*.l)
-$(error ERROR: no se ha encontrado ningun archivo de $(CC) (*.c), $(YACC) (*.y) ni $(LEX) (*.l) en el directorio de ubicacion de archivos fuente definido en la variable srcdir del GNUmakefile: "$(srcdir)")
+$(error ERROR: no se ha encontrado ningun archivo de C (*.c), YACC (*.y) ni LEX (*.l) en el directorio de ubicacion de archivos fuente definido en la variable srcdir del GNUmakefile: "$(srcdir)")
 endif
 endif
 
@@ -370,8 +381,8 @@ endef
 # Define una secuencia de comandos enlatada que muestra una nota si la depuración (debug) de YACC se encuentra habilitada (DEBUG_YACC=1)
 define sh_mostrar_nota_sobre_yacc_si_su_depuracion_se_encuentra_habilitada
 	if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ] && [ "X0" != "X$(DEBUG_YACC)" ]; then \
-		printf "\nNOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de $(YACC)\n" ; \
-		printf "  Para depurar $(YACC), tambien debe asignarle un valor entero distinto de 0 a la variable de tipo int yydebug\n" ; \
+		printf "\nNOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de YACC\n" ; \
+		printf "  Para depurar YACC, tambien debe asignarle un valor entero distinto de 0 a la variable de tipo int yydebug\n" ; \
 		printf "  Una manera de lograr eso es agregarle el siguiente codigo al main() antes de que se llame a yyparse():\n" ; \
 		printf "    #if YYDEBUG\n" ; \
 		printf "      yydebug = 1;\n" ; \
@@ -395,7 +406,7 @@ endef
 
 # Define una secuencia de comandos enlatada con una receta para (re)generar el otro makefile $(DEPDIR)%.d a incluir con prerequisitos producidos automáticamente desde $(srcdir)%.c
 define receta_para_.d
-	@printf "\n<<< $(CC): (Re)generando el otro makefile a incluir con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(1).d"
+	@printf "\n<<< CC: (Re)generando el otro makefile a incluir con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(1).d"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	printf "empty:\n\n%s" "$(call escapar_espacios,$(call escapar_espacios,$(1).d)) $(call escapar_espacios,$(call escapar_espacios,$(call escapar_simbolo_pesos_conforme_a_shell,$(OBJDIR))))" > "$(1).tmp"
 	$(CC) $(CPPFLAGS) $(CFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { $(RM) "$(1).tmp" ; false ; }
@@ -408,12 +419,15 @@ endef
 .SUFFIXES:
 # 	Esto se efectúa para cancelar las reglas implícitas predefinidas por make, ya que ninguna de ellas se utilizará y además con esto se ahorra en tiempo de ejecución
 
+# Para que GNU Make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
+.DELETE_ON_ERROR:
+
+# Para establecer explícitamente la meta por defecto, en lugar de que ésta sea el primer objetivo sin iniciar con '.' y que además no contenga una o más '/'
+.DEFAULT_GOAL: all
+
 # Para especificar los objetivos que no generan archivos con ese mismo nombre para que se ejecuten siempre por más de que los archivos puedan llegar a existir
 .PHONY: all clean run open cli_bin_debug_run cli_bin_debug_open empty
 # 	La receta de una regla siempre se ejecutará si tiene como prerequisito de tipo normal a un target que sea .PHONY
-
-# Para que GNU Make elimine el objetivo de una regla si ya se ha modificado y su receta finaliza con un estado de salida con valor no cero
-.DELETE_ON_ERROR:
 
 # A partir de aquí inicia la configuración para solamente imprimir los objetivos que deben ser (re)construidos así como sus dependencias que sean más recientes (todas si el objetivo no existe), según se encuentre habilitado o deshabilitado
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlo ó deshabilitarlo agregando PRINT_ONLY=0 ó PRINT_ONLY=1 como opción, respectivamente. Por ejemplo, para habilitarlo: <make PRINT_ONLY=1> y <make all PRINT_ONLY=1>
@@ -428,9 +442,8 @@ override PRINT_ONLY:=0
 $(info INFO: Como se ha agregado la opcion '-t' ó '--touch' al ejecutarse, se deshabilita el solamente imprimir los objetivos que deben ser (re)construidos asi como sus dependencias que sean mas recientes (todas si el objetivo no existe), por mas de que la variable PRINT_ONLY del GNUmakefile tenga definido un valor distinto de 0...)
 endif
 endif
-# Esto es útil para depurar el GNUmakefile y/o visualizar qué objetivos se (re)generarían al (re)construir, ya sea porque no existen o porque han quedado obsoletos por modificaciones en los archivos fuente, así como qué archivos han sido modificados desde la ultima (re)construccion.
 
-# Acá se configura el 'make all', según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
+# Acá se configura al objetivo 'all', según la regeneración de los archivos secundarios al ser eliminados se encuentre habilitada o deshabilitada
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando REGENERATE_SECONDARY=0 ó REGENERATE_SECONDARY=1 como opción, respectivamente. Por ejemplo, para deshabilitarla: <make REGENERATE_SECONDARY=0> y <make all REGENERATE_SECONDARY=0>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable REGENERATE_SECONDARY (si está escrito REGENERATE_SECONDARY?=1 ó REGENERATE_SECONDARY?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 REGENERATE_SECONDARY?=1
@@ -618,7 +631,7 @@ else
 				{ set +x ; } 2>/dev/null ; \
 				printf "<<< Realizado >>>\n" ;; \
 			(*) \
-				printf "\n<<< $(TMUX)->dot (.): Ejecutando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+				printf "\n<<< TMUX->dot (.): Ejecutando en una ventana nueva el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 				$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,TMUX,-V) ; \
 				set -x ; \
 					cd "$(DOLLAR-SIGNS-ESCAPED_bindir)" ; \
@@ -641,7 +654,7 @@ ifneq ($(PRINT_ONLY),0)
 else
 	@printf "\n=================[ Depurar el binario en esta ventana por medio de una interfaz de linea de comandos (CLI) ]=================\n"
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
-		printf "\n<<< $(GDB): Depurando en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+		printf "\n<<< GDB: Depurando en esta ventana por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 		$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,GDB,--version) ; \
 		set -x ; \
 			cd "$(DOLLAR-SIGNS-ESCAPED_bindir)" ; \
@@ -664,7 +677,7 @@ else
 	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
 		case "$(OPEN_COMMAND)" in \
 			("start") \
-				printf "\n<<< start->$(GDB): Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+				printf "\n<<< start->GDB: Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 				$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,GDB,--version) ; \
 				set -x ; \
 					cd "$(DOLLAR-SIGNS-ESCAPED_bindir)" ; \
@@ -672,7 +685,7 @@ else
 					cd - >/dev/null ; \
 				{ set +x ; } 2>/dev/null ;; \
 			(*) \
-				printf "\n<<< $(TMUX)->$(GDB): Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
+				printf "\n<<< TMUX->GDB: Depurando en una ventana nueva por medio de una interfaz de linea de comandos (CLI) el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
 				$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,TMUX,-V) ; \
 				$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,GDB,--version) ; \
 				set -x ; \
@@ -694,16 +707,18 @@ empty: ;
 
 # Para incluir el/los otro/s makefile/s ya generado/s con los prerequisitos producidos automáticamente
 sinclude $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.d"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.tab.d"?g' ;)) $(call sin_necesidad_de_comillas_dobles,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1.lex.yy.d"?g' ;))
-# 	La directiva sinclude hace que make suspenda la lectura del makefile actual y lea en orden los otros makefiles que se indican antes de continuar. Si alguno de los makefiles indicados no puede ser encontrado, no es un error fatal inmediato; el procesamiento de este makefile continúa. Una vez que haya finalizado la etapa de lectura de makefiles, make intentará rehacer cualquiera que haya quedado obsoleto o que no exista. Si no puede encontrar una regla para rehacer algún otro makefile, o sí que la encontró pero ocurre un fallo al ejecutar la receta, make lo diagnostica como un error fatal exclusivamente en caso de utilizarse la directiva include (no para las directivas -include y sinclude las cuales son equivalentes entre sí).
+# 	La directiva sinclude hace que GNU Make suspenda la lectura del makefile actual y lea en orden los otros makefiles que se indican antes de continuar. Si alguno de los makefiles indicados no puede ser encontrado, no es un error fatal inmediato; el procesamiento de este makefile continúa. Una vez que haya finalizado la etapa de lectura de makefiles, GNU Make intentará (re)hacer cualquiera que haya quedado obsoleto o que no exista. Si no puede encontrar una regla para (re)hacer algún otro makefile, o sí que la encontró pero ocurre un fallo al ejecutar la receta, GNU Make lo diagnostica como un error fatal solamente en caso de utilizarse la directiva include (no así para las directivas sinclude y -include las cuales son equivalentes entre sí)
+#	En este GNUmakefile no debería haber diferencia alguna entre usar la directiva include o las directivas sinclude ó -include, pero en versiones tempranas de GNU Make (entre la 3.81 y la 4.1 por lo menos), al utilizar la directiva include se muestra un error innecesario del estilo $(warning ...) cada vez que algún makefile indicado no puede ser encontrado (aún no existe) en el momento en el que se suspende la lectura del makefile actual y se leen en orden los otros makefiles que se indican antes de continuar; en este caso mensajes con el formato: GNUmakefile:NumeroDeLineaDeLaDirectivaInclude: $(DEPDIR)%.d: No such file or directory
+#		Si bien esto ya fue solucionado a partir de GNU Make 4.2, se prefirió utilizar cualquiera de las directivas sinclude ó -include (puesto que éstas son equivalentes entre sí) por sobre la directiva include justamente para que en las versiones más tempranas de GNU Make no aparezcan dichas advertencias absolutamente irrelevantes
 
 # Regla explícita con CC: Para (re)construir el binario $(bindir)$(PROGRAM)$(EXEEXT)
 $(call escapar_espacios,$(call escapar_simbolos_de_porcentaje_conforme_a_make,$(bindir)$(PROGRAM)$(EXEEXT))): $(call sin_necesidad_de_comillas_dobles,$(COBJS)) $(call sin_necesidad_de_comillas_dobles,$(YOBJS)) $(call sin_necesidad_de_comillas_dobles,$(LOBJS)) | $(TRAILING-SLASH-REMOVED-AND-SPACES-ESCAPED_bindir)
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
-	@printf "\n=================[ (Re)construccion con $(CC): \"%s\" ]=================\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n=================[ (Re)construccion con CC: \"%s\" ]=================\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_forzar_eliminacion_si_ya_existiera_el_binario,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
-	@printf "\n<<< $(CC)->$(CC): Enlazando todos los archivos objeto con las bibliotecas para (re)construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< CC->CC: Enlazando todos los archivos objeto y las bibliotecas para (re)construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS)) $(LDLIBS)
 	@printf "<<< Realizado >>>\n"
@@ -722,7 +737,7 @@ ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(YACC)->$(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< YACC->CC: (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(YOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
@@ -737,7 +752,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.tab.c $(PERCENT-SIGNS-AND-SPACES-ESC
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
-	@printf "\n<<< $(YACC): (Re)generando los archivos del analizador sintactico (parser): \"%s\" [WARNINGS_YACC: $(WARNINGS_YACC_ACTIVATION) | DEBUG_YACC: $(DEBUG_YACC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1<.tab.c><.tab.h><.output>?' ;))"
+	@printf "\n<<< YACC: (Re)generando los archivos del analizador sintactico (parser): \"%s\" [WARNINGS_YACC: $(WARNINGS_YACC_ACTIVATION) | DEBUG_YACC: $(DEBUG_YACC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1<.tab.c><.tab.h><.output>?' ;))"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,YACC,--version)
 	$(YACC) $(YFLAGS) -d -v -o"$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" | sed -e 's?.*/??' -e 's?\(.*\)\.y?$(SINGLE-QUOTES-ESCAPED_OBJDIR)\1.tab.c?' ;))" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
@@ -750,7 +765,7 @@ ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(LEX)->$(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< LEX->CC: (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LOBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
@@ -765,7 +780,7 @@ $(PERCENT-SIGNS-AND-SPACES-ESCAPED_OBJDIR)%.lex.yy.c: $$(call escapar_espacios,$
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
-	@printf "\n<<< $(LEX): (Re)generando el archivo del analizador lexico (scanner): \"%s\" [WARNINGS_LEX: $(WARNINGS_LEX_ACTIVATION) | DEBUG_LEX: $(DEBUG_LEX_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< LEX: (Re)generando el archivo del analizador lexico (scanner): \"%s\" [WARNINGS_LEX: $(WARNINGS_LEX_ACTIVATION) | DEBUG_LEX: $(DEBUG_LEX_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,LEX,--version)
 	$(LEX) $(LFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
@@ -778,7 +793,7 @@ ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
 	$(call receta_para_.d,$(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" | sed -e 's?.*/??' -e 's?\(.*\)\.o?$(SINGLE-QUOTES-ESCAPED_DEPDIR)\1?' ;)))
-	@printf "\n<<< $(CC): (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
+	@printf "\n<<< CC: (Re)generando el archivo objeto: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(COBJS_CFLAGS) -c -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$<)"
 	@printf "<<< Realizado >>>\n"
