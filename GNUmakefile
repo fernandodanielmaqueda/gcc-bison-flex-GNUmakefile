@@ -1,4 +1,4 @@
-# gcc-bison-flex-GNUmakefile, versión 2023.06.01-001-pre
+# gcc-bison-flex-GNUmakefile, versión 2023.06.05-001-pre
 # Este GNUmakefile sirve para construir, ejecutar y depurar proyectos en lenguaje C (archivos *.c con o sin archivos *.h asociados), proyectos en lenguaje C con flex (archivos *.l), proyectos en lenguaje C con bison (archivos *.y), y proyectos en lenguaje C con bison en conjunto con flex (así como proyectos que utilicen programas similares, como ser clang, yacc y lex)
 # Para conseguir más información y asegurarse de obtener la versión base original más reciente, visite el repositorio del proyecto <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -10,7 +10,7 @@
 # Nombre del proyecto/programa/binario
 PROGRAM:=miproyecto
 
-# Subdirectorio en el que están ubicados los archivos *.h, *.c, *.y, y *.l fuente (excepto los archivos intermedios generados por CC, YACC y LEX). O sino puede quedar vacío para que se utilice el directorio actual. Por defecto: src/
+# Subdirectorio en el que están ubicados los archivos *.c, *.y, y *.l fuente (excepto los archivos intermedios generados por CC, YACC y LEX). O sino puede quedar vacío para que se utilice el directorio actual. Por defecto: src/
 srcdir:=src/
 # Subdirectorio en el que se ubicará el binario construido. O sino puede quedar vacío para que se utilice el directorio actual. Por defecto: bin/
 bindir:=bin/
@@ -26,12 +26,12 @@ LEX:=flex
 
 # Depurador a usar y las opciones a pasarle, respectivamente
 GDB:=gdb
-GDBFLAGS:=
+GDBFLAGS=
 
 # Agregar acá las opciones que controlan el preprocesamiento que sean/serían COMUNES para TODOS los preprocesadores y/o compiladores de los lenguajes de programación (entre los que están C, C++, Objetive C, etc.). Por otra parte, añadir aquellas opciones que sean/serían SOLAMENTE para el preprocesador de C entre las variables CFLAGS, COBJS_CFLAGS, YOBJS_CFLAGS y/o LOBJS_CFLAGS, según el caso
 CPPFLAGS=-I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)" -I"$(if $(OBJDIR),$(DOLLAR-SIGNS-ESCAPED_OBJDIR),.)"
 # Entre las opciones que controlan el preprocesador, se encuentran:
-# 	-I"Directorio" (es una de las opciones que sirven para especificar directorios para la búsqueda de archivos de cabecera (header files) (*.h): añade el directorio Directorio a la lista de directorios para buscar archivos de cabecera durante el preprocesamiento). Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. Por ejemplo, -I"include/"
+# 	-I"Directorio" (es una de las opciones que sirven para especificar directorios para la búsqueda de archivos de cabecera (header files) (*.h): añade el directorio Directorio a la lista de directorios para buscar archivos de cabecera durante el preprocesamiento). Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. También puede utilizarse -I"." para indicar el directorio actual. Por ejemplo: -I"include/"
 #		Existen dos formas para la directiva de preprocesamiento #include:
 #			(1) La que lleva corchetes angulares (angle-bracket form) (<>), como #include <math.h>
 #			(2) La que lleva comillas dobles (quoted form) (""), como ser: #include "misfunciones.h"
@@ -46,7 +46,7 @@ CPPFLAGS=-I"$(if $(srcdir),$(DOLLAR-SIGNS-ESCAPED_srcdir),.)" -I"$(if $(OBJDIR),
 CFLAGS=-std=c99 -O0
 #	Para CC, por ejemplo:
 #		+ Opciones controlando el dialecto del lenguaje C: entre ellas, -ansi ó -std=c90 para C90, -std=c99 para C99, -std=c11 para C11, -std=c18 para C18, etc.
-#		+ Opciones para controlar el formato de los mensajes de diagnóstico (warnings)
+#		+ Opciones para controlar el formato de los mensajes de diagnóstico (warnings): entre ellas, -fdiagnostics-color=always
 #		+ Opciones que controlan la optimización: entre ellas, -O, -O1, -O2, -O3, -O0, Os, -Ofast, -Og, -Oz, etc.
 YFLAGS=--report=state --report=itemset --report=lookahead
 # 	Para YACC, por ejemplo:
@@ -63,18 +63,18 @@ LOBJS_CFLAGS=
 
 # Agregar acá las opciones para enlazar para CC
 #	Se espera que se añadan TODAS las opciones -lNombreBiblioteca en la variable LDLIBS, y el resto de las opciones en la variable LDFLAGS
-# 	Notar que ya se agregan las opciones -ly y -lfl para buscar y procesar las bibliotecas liby.a y libfl.a para YACC y LEX cuando se encuentran archivos fuente de YACC ($(srcdir)*.y) y LEX ($(srcdir)*.l) correspondientemente. Si el enlazador no pudiera encontrar alguna de esas bibliotecas, se las debe indicar manualmente añadiendo las opciones -L correspondientes en la variable LDFLAGS.
+# 	Notar que ya se agregan las opciones -ly y -lfl para buscar y procesar las bibliotecas liby.a y libfl.a (ó liby.so y libfl.so, típicamente) para YACC y LEX cuando se encuentran archivos fuente de YACC ($(srcdir)*.y) y LEX ($(srcdir)*.l) correspondientemente. Si el enlazador no pudiera encontrar alguna de esas bibliotecas, se las debe indicar manualmente añadiendo las opciones -L correspondientes en la variable LDFLAGS.
 LDFLAGS=
 LDLIBS=-lm
 # Entre las opciones para enlazar, se encuentran:
-#	-lNombreBiblioteca (son pasadas directamente al enlazador y sirven para buscar y procesar la biblioteca con NombreBiblioteca al enlazar). Por ejemplo, -lm para que se busque y procese la biblioteca libm.a la cual contiene archivos objeto con declaraciones y definiciones para el uso de las directivas #include <math.h>, #include <complex.h> e #include <fenv.h>
+#	-lNombreBiblioteca (son pasadas directamente al enlazador y sirven para buscar y procesar la biblioteca con NombreBiblioteca al enlazar). Por ejemplo, -lm para que se busque y procese la biblioteca libm.a (ó libm.so) la cual contiene implementaciones de funciones que se necesitan definir para math.h, complex.h y fenv.h: por ejemplo, sin, cos, tan, log, log10, modf, pow, sqrt, fabs, ceil, floor, fmod, etc.
 #		Existen dos tipos de bibliotecas:
-#			(1) Estáticas (static): son archivos como "libNombreBiblioteca.a" que a su vez contienen archivos objeto (archivos *.o) 
+#			(1) Estáticas (static): son archivos típicamente como "libNombreBiblioteca.a" que a su vez contienen archivos objeto (archivos *.o) 
 #			(2) Compartidas/Dinámicas (shared/dynamic): son archivos típicamente con la forma "libNombreBiblioteca.so"
 #		El enlazador busca en una lista estándar de directorios por la biblioteca con NombreBiblioteca. Los directorios en los que se busca incluye a varios directorios estándar del sistema sumado por cualquiera que se especifique con la opción -L
-#		No todos los objetivos (targets) -así es como denomina a los sistemas sobre los que se compila- soportan bibliotecas dinámicas, pero en aquellos en que sí: en el caso de que se encuentre tanto una biblioteca estática como una dinámica, el enlazador da preferencia a enlazar con la biblioteca dinámica a menos que se utilice la opción -static
-#		Importa el lugar del comando en el que se coloca esta opción; el enlazador busca y procesa bibliotecas y archivos objeto en el orden en el que éstos son especificados. Por ende, 'foo.o -lz bar.o' busca la biblioteca con nombre 'z' luego del archivo objeto 'foo.o' pero antes del archivo objeto 'bar.o'. Si 'bar.o' hace referencia a funciones que están en la biblioteca con nombre 'z', esas funciones podrían no ser cargadas
-#	-L"Directorio" (éstas opciones sirven para especificar directorios para la búsqueda de bibliotecas (archivos lib*.a y/o lib*.so): añade el directorio Directorio a la lista de directorios para las búsquedas con las opciones -l. Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. Por ejemplo, -L"lib/"
+#		No todos los objetivos (targets) -así es como se denomina a los sistemas sobre los que se compila- soportan bibliotecas dinámicas, pero en aquellos en que sí: en el caso de que se encuentre tanto una biblioteca estática como una dinámica, el enlazador da preferencia a enlazar con la biblioteca dinámica a menos que se utilice la opción -static
+#		Es importante el lugar del comando en el que se coloca esta opción; el enlazador busca y procesa bibliotecas y archivos objeto en el orden en el que éstos son especificados. Por ende, 'foo.o -lz bar.o' busca la biblioteca con nombre 'z' luego del archivo objeto 'foo.o' pero antes del archivo objeto 'bar.o'. Si 'bar.o' hace referencia a funciones que están en la biblioteca con nombre 'z', esas funciones podrían no ser cargadas
+#	-L"Directorio" (éstas opciones sirven para especificar directorios para la búsqueda de bibliotecas (archivos lib*.a y/o lib*.so típicamente): añade el directorio Directorio a la lista de directorios para las búsquedas con las opciones -l. Puede indicarse tanto por ruta relativa (desde este GNUmakefile) como por ruta absoluta, pero se recomienda la primera. También puede utilizarse -L"." para indicar el directorio actual. Por ejemplo, -L"lib/"
 
 # Acá se configuran las opciones para requerir o suprimir las advertencias (warnings) de CC al (re)generar los archivos objeto y/o al (re)construir el binario, según se encuentren habilitadas o deshabilitadas
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarlas ó deshabilitarlas agregando WARNINGS_CC=0 ó WARNINGS_CC=1 como opción, respectivamente. Por ejemplo, para deshabilitarlas: <make WARNINGS_CC=0>, <make all WARNINGS_CC=0> y <make clean all WARNINGS_CC=0>
@@ -133,7 +133,7 @@ endif
 DEBUG_CC?=1
 ifneq ($(DEBUG_CC),0)
 DEBUG_CC_ACTIVATION:=Si
-# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando sus símbolos de depuración (debug symbols) se encuentren habilitados (DEBUG_CC=1), como ser -g[level] (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse), -ggdb[level] y -gvms[level], opciones en las cuales level (el nivel) indica la cantidad de información de depuración, pudiendo estar entre 0 (nada) y 3 (extra) y que por defecto (si no se especifica) es 2.
+# 	Agregar a continuación las opciones que se le quieran pasar a CC cuando sus símbolos de depuración (debug symbols) se encuentren habilitados (DEBUG_CC=1), como ser -g[Nivel] (produce información de depuración en el formato nativo del sistema operativo (stabs, COFF, XCOFF, o DWARF) para que pueda depurarse), -ggdb[Nivel] y -gvms[Nivel], opciones en las cuales Nivel indica la cantidad de información de depuración, pudiendo estar entre 0 (nada) y 3 (extra) y que por defecto (si no se especifica) es 2.
 CFLAGS+=-g3
 else
 DEBUG_CC_ACTIVATION:=No
@@ -141,42 +141,42 @@ DEBUG_CC_ACTIVATION:=No
 CFLAGS+=
 endif
 
-# Acá se configuran las opciones para la depuración (debug) de YACC al (re)generar los archivos del analizador sintáctico (parser) y/o al (re)generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o), según se encuentre habilitada o deshabilitada
+# Acá se configuran las opciones para la depuración (debug) del analizador sintáctico (parser) generado por YACC al (re)generar sus archivos y/o al (re)generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o), según se encuentre habilitada o deshabilitada
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_YACC=0 ó DEBUG_YACC=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_YACC=1>, <make all DEBUG_YACC=1> y <make clean all DEBUG_YACC=1>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable DEBUG_YACC (si está escrito DEBUG_YACC?=1 ó DEBUG_YACC?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 DEBUG_YACC?=0
 ifneq ($(DEBUG_YACC),0)
 DEBUG_YACC_ACTIVATION:=Si
-# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando su depuración (debug) se encuentre habilitada (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando la depuración (debug) de su analizador sintáctico (parser) se encuentren habilitada (DEBUG_YACC=1), como ser -t (define la macro YYDEBUG a 1 si no se la define)
 YFLAGS+=-t
-# 	Cuando la depuración (debug) de YACC se encuentre habilitada (DEBUG_YACC=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
+# 	Cuando la depuración (debug) del analizador sintáctico (parser) generado por YACC se encuentre habilitada (DEBUG_YACC=1), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en un valor entero distinto de 0 lo cual permite la depuracion de YACC
 YOBJS_CFLAGS+=-DYYDEBUG=1
 else
 DEBUG_YACC_ACTIVATION:=No
-# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando su depuración (debug) se encuentre habilitada (DEBUG_YACC=0)
+# 	Agregar a continuación las opciones que se le quieran pasar a YACC cuando la depuración (debug) de analizador sintáctico (parser) generado se encuentre deshabilitada (DEBUG_YACC=0)
 YFLAGS+=
-# 	Cuando la depuración (debug) de YACC se encuentre deshabilitada (DEBUG_YACC=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
+# 	Cuando la depuración (debug) del analizador sintáctico (parser) generado por YACC se encuentre deshabilitada (DEBUG_YACC=0), y sólo cuando CC vaya a generar el archivo objeto desde el archivo de C generado por YACC (de *.tab.c a *.tab.o) se le pasará este flag -D para que defina la macro YYDEBUG en el valor entero 0 lo cual NO permite la depuracion de YACC
 YOBJS_CFLAGS+=-DYYDEBUG=0
 endif
 
-# Acá se configuran las opciones para la depuración (debug) de LEX al (re)generar los archivos del analizador léxico (scanner), según se encuentre habilitada o deshabilitada
+# Acá se configuran las opciones para la depuración (debug) del analizador léxico (scanner) generado por LEX al (re)generar sus archivos, según se encuentre habilitada o deshabilitada
 #	Al ejecutar este GNUmakefile con GNU Make, se puede indicar si habilitarla ó deshabilitarla agregando DEBUG_LEX=0 ó DEBUG_LEX=1 como opción, respectivamente. Por ejemplo, para habilitarla: <make DEBUG_LEX=1>, <make all DEBUG_LEX=1> y <make clean all DEBUG_LEX=1>
 #	En caso de que no se lo indique, se habilita ó deshabilita de acuerdo con el valor definido por defecto para la variable DEBUG_LEX (si está escrito DEBUG_LEX?=1 ó DEBUG_LEX?=0 por ejemplo), debido a que si es distinto de 0 se habilita, caso contrario se deshabilita
 DEBUG_LEX?=0
 ifneq ($(DEBUG_LEX),0)
 DEBUG_LEX_ACTIVATION:=Si
-# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando su depuración (debug) se encuentre habilitada (DEBUG_LEX=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando la depuración (debug) de su analizador léxico (scanner) generado se encuentre habilitada (DEBUG_LEX=1), como ser -d (hace que el analizador generado se ejecute en modo de depuración)
 LFLAGS+=-d
 else
 DEBUG_LEX_ACTIVATION:=No
-# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando su depuración (debug) se encuentre habilitada (DEBUG_LEX=0)
+# 	Agregar a continuación las opciones que se le quieran pasar a LEX cuando la depuración (debug) de su analizador léxico (scanner) generado se encuentre deshabilitada (DEBUG_LEX=0)
 LFLAGS+=
 endif
 
 # Define una variable que contiene un solo espacio para luego utilizarla para sustituir con secuencias de escape cada uno de los espacios
 espacio:=$(subst ",," ")
 
-# Define una variable que contiene un símbolo numeral para poder ser utilizado adentro de referencias macro y/o invocaciones de funciones de make
+# Define una variable que contiene un símbolo numeral para poder ser utilizado adentro de referencias macro y/o invocaciones de funciones de GNU Make
 numeral:=\#
 
 # Para realizar las secuencias de escape para los espacios del valor pasado como parámetro
@@ -330,17 +330,17 @@ YDEFS=$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comil
 # Acciones de acuerdo con los archivos fuente presentes en el proyecto
 ifneq ($(YOBJS)$(LOBJS),)
 ifneq ($(YOBJS),)
-# 	Agrega la opción -ly para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca liby.a la cual contiene declaraciones y definiciones necesarias para el enlace con YACC. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la variable LDFLAGS.
+# 	Agrega la opción -ly para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca liby.a (ó liby.so, típicamente) la cual contiene implementaciones de funciones que se necesitan definir para el analizador sintáctico (parser) generado por YACC: una función yyerror y un main. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la variable LDFLAGS.
 LDLIBS+=-ly
 endif
 ifneq ($(LOBJS),)
-# 	Agrega la opción -lfl para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca libfl.a la cual contiene declaraciones y definiciones de LEX necesarias para el enlace con LEX. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la varible LDFLAGS.
+# 	Agrega la opción -lfl para CC (y que este a su vez se la pasa directamente al enlazador) para que busque y procese la biblioteca libfl.a (ó libfl.so, típicamente) la cual contiene implementaciones de funciones que se necesitan definir para el analizador léxico (scanner) generado por LEX: una función yywrap y un main. Si el enlazador no pudiera encontrar esa biblioteca, se la debe indicar manualmente añadiendo la opción -L correspondiente en la varible LDFLAGS.
 LDLIBS+=-lfl
 endif
 else
 ifeq ($(COBJS),)
 # 	Alerta si no ha encontrado ningún archivo fuente de C ($(srcdir)*.c), YACC ($(srcdir)*.y) ni de LEX ($(srcdir)*.l)
-$(error ERROR: no se ha encontrado ningun archivo de C (*.c), YACC (*.y) ni LEX (*.l) en el directorio de ubicacion de archivos fuente definido en la variable srcdir del GNUmakefile: "$(srcdir)")
+$(error ERROR: no se ha encontrado ningun archivo fuente de C (*.c), YACC (*.y) ni LEX (*.l) en el directorio definido en la variable srcdir del GNUmakefile: "$(srcdir)")
 endif
 endif
 
@@ -352,41 +352,40 @@ endef
 # Define una secuencia de comandos enlatada para mostrar la ruta hacia el comando
 ifeq ($(PATHNAME_COMMAND),where)
 define sh_ruta_comando
-	printf "** Ruta hacia $($(1)): %s **\n" "$$(where $($(1)) | sed -n 1p | sed 's?\\\?\\\\?g')"
+	printf "** Ruta hacia $(1): %s **\n" "$$(where $($(1)) | sed -n 1p | sed 's?\\\?\\\\?g')"
 endef
 else
 define sh_ruta_comando
-	printf "** Ruta hacia $($(1)): %s **\n" "$$(command -v $($(1)))"
+	printf "** Ruta hacia $(1): %s **\n" "$$(command -v $($(1)))"
 endef
 endif
 
-# Define una secuencia de comandos enlatada para comprobar que un comando esté instalado y se puede encontrar y ejecutar, imprimir la ruta hacia dicho comando y seguidamente la versión instalada de dicho comando; todo esto dado el nombre de la variable que contiene el nombre del comando y la opción para que éste imprima la versión instalada
+# Define una secuencia de comandos enlatada para comprobar que un comando esté instalado y que se pueda encontrar y ejecutar, imprimir la ruta hacia dicho comando y seguidamente su versión instalada; todo esto dado el nombre de la variable que contiene el nombre del comando y la opción para que éste imprima la versión instalada
 define sh_comprobar_existencia_y_mostrar_ruta_y_version_comando
 	$(call sh_existe_comando,$(1)) ; \
 	$(call sh_ruta_comando,$(1)) ; \
-	printf "** Version instalada de $($(1)): %s **\n" "$$($($(1)) $(2) | sed -n 1p 2>/dev/null)"
+	printf "** Version instalada de $(1): %s **\n" "$$($($(1)) $(2) | sed -n 1p 2>/dev/null)"
 endef
 
-# Define una secuencia de comandos enlatada la cual fuerza la eliminación del binario si este ya existiera, por si el archivo está en uso, ya que esto impediría su reconstrucción
-define sh_forzar_eliminacion_si_ya_existiera_el_binario
-	if [ -f "$(1)" ]; then \
-		printf "\n<<< Eliminando el binario ya existente: \"%s\" >>>\n" "$(1)" ; \
+# Define una secuencia de comandos enlatada que elimina un archivo, dados su descripción y su nombre 
+define sh_eliminar_archivo
+	if [ -f "$(2)" ]; then \
+		printf "\n<<< Eliminando $(1): \"%s\" >>>\n" "$(2)" ; \
 		set -x ; \
-			$(RM) "$(1)" ; \
+			$(RM) "$(2)" ; \
 		{ set +x ; } 2>/dev/null ; \
 		printf "<<< Realizado >>>\n" ; \
 	fi
 endef
 
-# Define una secuencia de comandos enlatada que muestra una nota si la depuración (debug) de YACC se encuentra habilitada (DEBUG_YACC=1)
-define sh_mostrar_nota_sobre_yacc_si_su_depuracion_se_encuentra_habilitada
-	if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ] && [ "X0" != "X$(DEBUG_YACC)" ]; then \
-		printf "\nNOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de YACC\n" ; \
-		printf "  Para depurar YACC, tambien debe asignarle un valor entero distinto de 0 a la variable de tipo int yydebug\n" ; \
-		printf "  Una manera de lograr eso es agregarle el siguiente codigo al main() antes de que se llame a yyparse():\n" ; \
-		printf "    #if YYDEBUG\n" ; \
-		printf "      yydebug = 1;\n" ; \
-		printf "    #endif\n" ; \
+# Define una secuencia de comandos enlatada que elimina un directorio, dado su nombre
+define sh_eliminar_directorio
+	if [ -d "$(1)" ]; then \
+		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(1)" ; \
+		set -x ; \
+			rmdir "$(1)" 2>/dev/null || true ; \
+		{ set +x ; } 2>/dev/null ; \
+		printf "<<< Realizado >>>\n" ; \
 	fi
 endef
 
@@ -404,14 +403,26 @@ define sh_mostrar_nota_sobre_tmux
 	read
 endef
 
+# Define una secuencia de comandos enlatada que muestra una nota si la depuración (debug) del analizador sintáctico (parser) generado por YACC se encuentra habilitada (DEBUG_YACC=1)
+define sh_mostrar_nota_sobre_yacc_si_su_depuracion_se_encuentra_habilitada
+	if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ] && [ "X0" != "X$(DEBUG_YACC)" ]; then \
+		printf "\nNOTA: Se ha definido la macro YYDEBUG en un valor entero distinto de 0 para permitir la depuracion de YACC\n" ; \
+		printf "  Para depurar YACC, tambien debe asignarle un valor entero distinto de 0 a la variable de tipo int yydebug\n" ; \
+		printf "  Una manera de lograr eso es agregarle el siguiente codigo al main() antes de que se llame a yyparse():\n" ; \
+		printf "    #if YYDEBUG\n" ; \
+		printf "      yydebug = 1;\n" ; \
+		printf "    #endif\n" ; \
+	fi
+endef
+
 # Define una secuencia de comandos enlatada con una receta para (re)generar el otro makefile $(DEPDIR)%.d a incluir con prerequisitos producidos automáticamente desde $(srcdir)%.c
 define receta_para_.d
 	@printf "\n<<< CC: (Re)generando el otro makefile a incluir con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(1).d"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
-	printf "empty:\n\n%s" "$(call escapar_espacios,$(call escapar_espacios,$(1).d)) $(call escapar_espacios,$(call escapar_espacios,$(call escapar_simbolo_pesos_conforme_a_shell,$(OBJDIR))))" > "$(1).tmp"
-	$(CC) $(CPPFLAGS) $(CFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).tmp" || { $(RM) "$(1).tmp" ; false ; }
-	sed -e ':a' -e '3s?^\([^:]*\)\(^\|[^\\]\)%?\1\2\\\%?' -e 't a' -e 's?\(^\|[^$$]\)\$$\($$\|[^$$]\)?\1$$$$\2?g' -e 's?\(^\|[^\\]\)#?\1\\\#?g' < "$(1).tmp" > "$(1).d"
-	$(RM) "$(1).tmp"
+	printf "empty:\n\n%s" "$(call escapar_espacios,$(call escapar_espacios,$(1).d)) $(call escapar_espacios,$(call escapar_espacios,$(call escapar_simbolo_pesos_conforme_a_shell,$(OBJDIR))))" > "$(1).d.tmp"
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MM "$(call escapar_simbolo_pesos_conforme_a_shell,$<)" >> "$(1).d.tmp" || { $(RM) "$(1).d.tmp" ; false ; }
+	sed -e ':a' -e '3s?^\([^:]*\)\(^\|[^\\]\)%?\1\2\\\%?' -e 't a' -e 's?\(^\|[^$$]\)\$$\($$\|[^$$]\)?\1$$$$\2?g' -e 's?\(^\|[^\\]\)#?\1\\\#?g' < "$(1).d.tmp" > "$(1).d"
+	$(RM) "$(1).d.tmp"
 	@printf "<<< Realizado >>>\n"
 endef
 
@@ -466,131 +477,41 @@ endif
 # Regla explícita que tiene como objetivo este mismo GNUmakefile para evitar que make intente reconstruirlo, ya que eso no es necesario, con lo cual se optimiza el tiempo de inicialización
 GNUmakefile:: ;
 
-# Regla explícita para borrar todos los archivos intermedios y el binario generados al construir
+# Regla explícita para borrar el binario y todos los archivos intermedios generados al construir
 clean:
 ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe construir el objetivo \"%s\".\n" "$@"
 else
 	@printf "\n=================[ Eliminar todo lo que se genera al construir ]=================\n"
-	@if [ -f "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ]; then \
-		printf "\n<<< Eliminando el binario: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-		set -x ; \
-			$(RM) "$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT)" ; \
-		{ set +x ; } 2>/dev/null ; \
-		printf "<<< Realizado >>>\n" ; \
-	fi
-	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_bindir)" ]; then \
-		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_bindir)" ; \
-		set -x ; \
-			rmdir "$(DOLLAR-SIGNS-ESCAPED_bindir)" 2>/dev/null || true ; \
-		{ set +x ; } 2>/dev/null ; \
-		printf "<<< Realizado >>>\n" ; \
-	fi
+	@$(call sh_eliminar_archivo,el binario,$(DOLLAR-SIGNS-ESCAPED_bindir)$(DOLLAR-SIGNS-ESCAPED_PROGRAM)$(EXEEXT))
+	@$(call sh_eliminar_directorio,$(DOLLAR-SIGNS-ESCAPED_bindir))
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
-			for EXT in .lex.yy.o .lex.yy.c ; do \
-				if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
-					printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
-					set -x ; \
-						$(RM) "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
-					{ set +x ; } 2>/dev/null ; \
-					printf "<<< Realizado >>>\n" ; \
-				fi ; \
-			done ; \
+			$(call sh_eliminar_archivo,el archivo objeto,$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.lex.yy.o) ; \
+			$(call sh_eliminar_archivo,el otro makefile con prerequisitos producidos automaticamente,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d) ; \
+			$(call sh_eliminar_archivo,el archivo temporal,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d.tmp) ; \
+			$(call sh_eliminar_archivo,el archivo fuente de C generado por LEX que implementa un analizador lexico (scanner),$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.lex.yy.c) ; \
 		done ; \
 	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
-			for EXT in .tab.o .output .tab.h .tab.c ; do \
-				if [ -f "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ]; then \
-					printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
-					set -x ; \
-						$(RM) "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME$$EXT" ; \
-					{ set +x ; } 2>/dev/null ; \
-					printf "<<< Realizado >>>\n" ; \
-				fi ; \
-			done ; \
-		done ; \
-	fi
-	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
-		for COBJ in $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) ; do \
-			if [ -f "$$COBJ" ]; then \
-				printf "\n<<< Eliminando el archivo intermedio: \"%s\" >>>\n" "$$COBJ" ; \
-				set -x ; \
-					$(RM) "$$COBJ" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-		done ; \
-	fi
-	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ]; then \
-		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" ; \
-		set -x ; \
-			rmdir "$(DOLLAR-SIGNS-ESCAPED_OBJDIR)" 2>/dev/null || true ; \
-		{ set +x ; } 2>/dev/null ; \
-		printf "<<< Realizado >>>\n" ; \
-	fi
-	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' ]; then \
-		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(LOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.lex\.yy\.o"?"\1"?g' ;)) ; do \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ]; then \
-				printf "\n<<< Eliminando el otro makefile con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.d" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ]; then \
-				printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.lex.yy.tmp" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-		done ; \
-	fi
-	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' ]; then \
-		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(YOBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.tab\.o"?"\1"?g' ;)) ; do \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ]; then \
-				printf "\n<<< Eliminando el otro makefile con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ]; then \
-				printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.tmp" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
+			$(call sh_eliminar_archivo,el archivo objeto,$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.tab.o) ; \
+			$(call sh_eliminar_archivo,el otro makefile con prerequisitos producidos automaticamente,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d) ; \
+			$(call sh_eliminar_archivo,el archivo temporal,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tab.d.tmp) ; \
+			$(call sh_eliminar_archivo,el archivo de texto con informacion sobre el analizador sintactico (parser) generado por YACC,$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.output) ; \
+			$(call sh_eliminar_archivo,el archivo de cabecera con definiciones del analizador sintactico (parser) generado por YACC,$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.tab.h) ; \
+			$(call sh_eliminar_archivo,el archivo fuente de C generado por YACC que implementa un analizador sintactico (parser),$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.tab.c) ; \
 		done ; \
 	fi
 	@if [ -n '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' ]; then \
 		for BASENAME in $(call escapar_simbolo_pesos_conforme_a_shell,$(shell printf "%s" '$(call escapar_comillas_simples_dentro_de_otras_comillas_simples,$(COBJS))' | sed -e 's?"[^"]*/?"?g' -e 's?"\([^"]*\)\.o"?"\1"?g' ;)) ; do \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ]; then \
-				printf "\n<<< Eliminando el otro makefile con prerequisitos producidos automaticamente: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
-			if [ -f "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ]; then \
-				printf "\n<<< Eliminando el archivo temporal: \"%s\" >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
-				set -x ; \
-					$(RM) "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.tmp" ; \
-				{ set +x ; } 2>/dev/null ; \
-				printf "<<< Realizado >>>\n" ; \
-			fi ; \
+			$(call sh_eliminar_archivo,el archivo objeto,$(DOLLAR-SIGNS-ESCAPED_OBJDIR)$$BASENAME.o) ; \
+			$(call sh_eliminar_archivo,el otro makefile con prerequisitos producidos automaticamente,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d) ; \
+			$(call sh_eliminar_archivo,el archivo temporal,$(DOLLAR-SIGNS-ESCAPED_DEPDIR)$$BASENAME.d.tmp) ; \
 		done ; \
 	fi
-	@if [ -d "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ]; then \
-		printf "\n<<< Eliminando el directorio \"%s\" si esta vacio y no esta en uso >>>\n" "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" ; \
-		set -x ; \
-			rmdir "$(DOLLAR-SIGNS-ESCAPED_DEPDIR)" 2>/dev/null || true ; \
-		{ set +x ; } 2>/dev/null ; \
-		printf "<<< Realizado >>>\n" ; \
-	fi
+	@$(call sh_eliminar_directorio,$(DOLLAR-SIGNS-ESCAPED_OBJDIR))
+	@$(call sh_eliminar_directorio,$(DOLLAR-SIGNS-ESCAPED_DEPDIR))
 	@printf "\n=================[ Finalizado ]=============\n"
 endif
 
@@ -717,7 +638,7 @@ ifneq ($(PRINT_ONLY),0)
 	@printf "  * Se debe (re)construir el objetivo \"%s\". Sus dependencias que son mas recientes son: %s\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)" "$(call escapar_simbolo_pesos_conforme_a_shell,$?)"
 else
 	@printf "\n=================[ (Re)construccion con CC: \"%s\" ]=================\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
-	@$(call sh_forzar_eliminacion_si_ya_existiera_el_binario,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
+	@$(call sh_eliminar_archivo,el binario ya existente,$(call escapar_simbolo_pesos_conforme_a_shell,$@))
 	@printf "\n<<< CC->CC: Enlazando todos los archivos objeto y las bibliotecas para (re)construir el binario: \"%s\" [WARNINGS_CC: $(WARNINGS_CC_ACTIVATION) | DEBUG_CC: $(DEBUG_CC_ACTIVATION)] >>>\n" "$(call escapar_simbolo_pesos_conforme_a_shell,$@)"
 	@$(call sh_comprobar_existencia_y_mostrar_ruta_y_version_comando,CC,--version)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o"$(call escapar_simbolo_pesos_conforme_a_shell,$@)" $(call escapar_simbolo_pesos_conforme_a_shell,$(COBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(YOBJS)) $(call escapar_simbolo_pesos_conforme_a_shell,$(LOBJS)) $(LDLIBS)
