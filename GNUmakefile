@@ -26,8 +26,6 @@ $(program1)_SOURCES:=$($(program1)_FIND_SOURCES)
 #   Sets the program's linking order. You may add the -l and -L linking flags here
 $(program1)_LDADD:=$($(program1)_SOURCES)
 
-$(info sources:$($(program1)_SOURCES))
-
 # Add here the options to be passed to CC for the preprocessing phase for $(program1)
 $(program1)_CPPFLAGS=
 # Add here the options to be passed to CC for $(program1)
