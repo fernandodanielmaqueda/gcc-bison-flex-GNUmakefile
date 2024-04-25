@@ -1,4 +1,4 @@
-# Filename: main.mk / v2024.03.25-001, part of gcc-bison-flex-GNUmakefile
+# Filename: main.mk / v2024.04.25-001, part of gcc-bison-flex-GNUmakefile
 # GNU Make framework for building, executing and debugging C language projects, including those involving C source code generation from Lex-like and/or Yacc-like tools
 # For more information and getting the most recent clean template, visit <https://github.com/fernandodanielmaqueda/gcc-bison-flex-GNUmakefile>
 
@@ -32,6 +32,9 @@ MKFWK_LAST_INCLUDED_DIR=$(filter-out ./,$(dir $(lastword $(MAKEFILE_LIST))))
 # Note: when using the MKFWK_LAST_INCLUDING_DIR and MKFWK_LAST_INCLUDED_DIR variables, parsing them should be immediate and not deferred,
 #   since their expansion might differ depending where they are evaluated
 
+# Defines a variable containing the path to this makefile
+MKFWK_MAIN_MAKEFILE:=$(MKFWK_LAST_INCLUDED_DIR)main.mk
+
 # Prevents GNU Make from even considering to remake this very same makefile, as that isn't necessary, thus optimizing startup time
 .PHONY: $(MKFWK_LAST_INCLUDED_DIR)main.mk
 
@@ -49,6 +52,9 @@ MKFWK_LANG_DIR:=$(MKFWK_LAST_INCLUDED_DIR)lang/
 # Subdirectory where the *.mk language-specific code makefiles of the GNU Make framework to be included are located.
 #   By default: en_US/
 MKFWK_CODE_DIR:=en_US/
+
+# Adds to the list of binary prefixes.
+BINARY_PREFIXES+=BIN
 
 # Subdirectory where resulting programs and libraries shall be placed.
 #   If left empty uses the directory of the top-level makefile. By default: bin/
@@ -101,11 +107,6 @@ STARTUP_CHECKS=X
 
 # Option to enable/disable runtime checks
 RUNTIME_CHECKS=X
-
-# The program targeted to run, and/or debug, and the arguments to pass to it, respectively.
-#   For the former, by default it is set to the first program set to be made and placed into BINDIR
-TARGET_PROGRAM=$(BINDIR)$(firstword $(BIN_PROGRAMS))$(EXEEXT)
-TARGET_PROGRAM_ARGS=
 
 ## Ending of the sub-section of options of the GNU Make framework
 
@@ -160,7 +161,7 @@ YACC_CPPFLAGS=
 LEX_CPPFLAGS=
 
 # Add here the options to be globally passed to CC, YACC, and LEX, respectively.
-CFLAGS=-std=c99 -O0
+CFLAGS=-fdiagnostics-color=always -std=c17 -O0
 YFLAGS=--report=state --report=itemset --report=lookahead
 LFLAGS=
 
@@ -217,9 +218,11 @@ endif
 # Defines the options to be passed to CC when CC_DEBUG is enabled/disabled
 ifneq ($(CC_DEBUG),)
 #   Add here the options to be passed to CC when CC_DEBUG is enabled
+CPPFLAGS+=-DDEBUG=1
 CFLAGS+=-g3
 else
 #   Add here the options to be passed to CC when CC_DEBUG is disabled
+CPPFLAGS+=-DDEBUG=0
 CFLAGS+=
 endif
 
@@ -261,15 +264,8 @@ MKFWK_HEADER_DIR=
 # Defines canned directives to be parsed at the footer of the user's project makefiles
 define MKFWK_FOOTER
 
-# "Pops" a word from the "stack" variable, thus decrementing the current "depth"
-MKFWK_DEPTH_STACK:=$(wordlist 2,$(words $(MKFWK_DEPTH_STACK)),X $(MKFWK_DEPTH_STACK))
-#   Note: in this case is not necessary to check if the "stack" is empty before attempting to "pop" from it.
-#     This is because the main.mk makefile needs to be included in order for this MKFWK_FOOTER variable
-#     to be defined in the first place (which guarantees that the "stack" won't be empty the first time we "pop"),
-#     and we also clear the MKFWK_FOOTER variable once the "stack" gets empty
-
-# Only once the "stack" variable has gotten empty (meaning we should currently be in the top-level makefile)...
-ifeq ($(MKFWK_DEPTH_STACK),)
+# Only once the "stack" variable indicates that we should currently be in the top-level makefile...
+ifeq ($(MKFWK_DEPTH_STACK),1)
 #   Includes the space-separated list of *.mk footer makefiles of the GNU Make framework in the established order. If any couldn't be found, it shall fail
 include $(MKFWK_FOOTER_DIR)base.mk $(MKFWK_FOOTER_DIR)central.mk $(MKFWK_FOOTER_DIR)cleaning.mk $(MKFWK_FOOTER_DIR)executing.mk $(MKFWK_FOOTER_DIR)making.mk $(MKFWK_FOOTER_DIR)void.mk
 #   Clears the MKFWK_FOOTER variable
@@ -277,6 +273,13 @@ MKFWK_FOOTER=
 MKFWK_FOOTER_DIR=
 MKFWK_LAST_INCLUDED_DIR=
 endif
+
+# "Pops" a word from the "stack" variable, thus decrementing the current "depth"
+MKFWK_DEPTH_STACK:=$(wordlist 2,$(words $(MKFWK_DEPTH_STACK)),X $(MKFWK_DEPTH_STACK))
+#   Note: in this case is not necessary to check if the "stack" is empty before attempting to "pop" from it.
+#     This is because the main.mk makefile needs to be included in order for this MKFWK_FOOTER variable
+#     to be defined in the first place (which guarantees that the "stack" won't be empty the first time we "pop"),
+#     and we also clear the MKFWK_FOOTER variable once the "stack" gets empty
 
 endef
 

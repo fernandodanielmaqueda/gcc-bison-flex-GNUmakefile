@@ -1,4 +1,4 @@
-# Filename: base.mk / v2024.03.25-001, part of gcc-bison-flex-GNUmakefile
+# Filename: base.mk / v2024.04.25-001, part of gcc-bison-flex-GNUmakefile
 # Makefile containing base definitions for the rest of the footer makefiles
 # Copyright (C) 2022-2024 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
 # You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.
@@ -7,7 +7,7 @@
 .PHONY: $(MKFWK_FOOTER_DIR)base.mk
 
 # Adds the default directories needed to be made when building
-TARGET_DIRS+=$(shell $(PRINTF) '%s\n' '$(BINDIR)' $(foreach prefix,BIN,$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES)))) | $(SED) -e '2,$${' -e 'h' -e 's?^?$(OBJDIR)?' -e 'p' -e 'g' -e 's?^?$(DEPDIR)?' -e '}' | $(SED) -e 's?[^/]*$$??' -e 's?/$$??' | $(SED) -n -e ':a' -e 'p' -e 's?/[^/]*$$??' -e 'ta' ;)
+TARGET_DIRS+=$(shell $(PRINTF) '%s\n' $(foreach prefix,$(BINARY_PREFIXES),'$($(prefix)DIR)') $(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES)))) | $(SED) -e '$(words $(BINARY_PREFIXES) X),$${' -e 'h' -e 's?^?$(OBJDIR)?' -e 'p' -e 'g' -e 's?^?$(DEPDIR)?' -e '}' | $(SED) -e 's?[^/]*$$??' -e 's?/$$??' | $(SED) -n -e ':a' -e 'p' -e 's?/[^/]*$$??' -e 'ta' ;)
 # Removes duplicates (separately, just in case the user added directories)
 TARGET_DIRS:=$(sort $(TARGET_DIRS))
 
@@ -15,11 +15,11 @@ TARGET_DIRS:=$(sort $(TARGET_DIRS))
 ifneq ($(STARTUP_CHECKS),)
 
 # Checks that source files were set for each program, static library and shared library
-$(foreach prefix,BIN,$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$(if $($(basename)_SOURCES),,$(error $(call mkfwk_make_msg_error_source_files_unset,$(basename)_SOURCES))))))
+$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$(if $($(basename)_SOURCES),,$(error $(call mkfwk_make_msg_error_source_files_unset,$(basename)_SOURCES))))))
 mkfwk_make_msg_error_source_files_unset=
 
 # Checks that a linking order was set for each program and shared library
-$(foreach prefix,BIN,$(foreach primary,PROGRAMS SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$(if $($(basename)_LDADD),,$(error $(call mkfwk_make_msg_error_linking_order_unset,$(basename)_LDADD))))))
+$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$(if $($(basename)_LDADD),,$(error $(call mkfwk_make_msg_error_linking_order_unset,$(basename)_LDADD))))))
 mkfwk_make_msg_error_linking_order_unset=
 
 endif

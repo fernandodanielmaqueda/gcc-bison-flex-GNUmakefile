@@ -1,4 +1,4 @@
-# Filename: making.mk / v2024.03.25-001, part of gcc-bison-flex-GNUmakefile
+# Filename: making.mk / v2024.04.25-001, part of gcc-bison-flex-GNUmakefile
 # Makefile containing targets to actually make
 # Copyright (C) 2022-2024 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
 # You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.
@@ -7,20 +7,20 @@
 .PHONY: $(MKFWK_FOOTER_DIR)making.mk
 
 # Adds the -fpic option to be passed to CC when compiling each shared library
-$(foreach basename,$(foreach prefix,BIN,$(foreach primary,SOLIBRARIES,$($(prefix)_$(primary)))),$(eval $(basename)_CFLAGS+=-fpic))
+$(foreach basename,$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,SOLIBRARIES,$($(prefix)_$(primary)))),$(eval $(basename)_CFLAGS+=-fpic))
 
 # Adds the primary options to their source files
-$(foreach basename,$(foreach prefix,BIN,$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$($(prefix)_$(primary)))),$(foreach source,$(sort $(filter %.c %.y %.l,$($(basename)_SOURCES))),\
+$(foreach basename,$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$($(prefix)_$(primary)))),$(foreach source,$(sort $(filter %.c %.y %.l,$($(basename)_SOURCES))),\
   $(eval $(source)_CPPFLAGS+=$($(basename)_CPPFLAGS)) \
   $(eval $(source)_CFLAGS+=$($(basename)_CFLAGS)) \
   $(eval $(source)_ASFLAGS+=$($(basename)_ASFLAGS)) \
 ))
 
 # Produces the pathnames of the header files with YACC definitions to (re)generate ($(OBJDIR)*.tab.h)
-MKFWK_YDEFS=$(patsubst %.y,$(OBJDIR)%.tab.h,$(filter %.y,$(foreach prefix,BIN,$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES))))))
+MKFWK_YDEFS=$(patsubst %.y,$(OBJDIR)%.tab.h,$(filter %.y,$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES))))))
 
 # Defines new variables from existing ones but removing any trailing slash, so it can be directly used as a prerequisite name
-$(foreach prefix,BIN,$(eval MKFWK_TRAILING_SLASH_REMOVED-$(prefix)DIR:=$(patsubst %/,%,$($(prefix)DIR))))
+$(foreach prefix,$(BINARY_PREFIXES),$(eval MKFWK_TRAILING_SLASH_REMOVED-$(prefix)DIR:=$(patsubst %/,%,$($(prefix)DIR))))
 
 # Parses an explicit rule with an empty recipe which does nothing
 .PHONY: empty
@@ -29,7 +29,7 @@ empty: ;
 
 # If the INCLUDE_DEPS option is enabled, includes the makefiles with automatically generated dependencies ($(DEPDIR)*.d files) whether they are already made or not
 ifneq ($(INCLUDE_DEPS),)
-sinclude $(patsubst %.c,$(DEPDIR)%.d,$(patsubst %.y,$(DEPDIR)%.tab.d,$(patsubst %.l,$(DEPDIR)%.lex.yy.d,$(filter %.c %.y %.l,$(foreach prefix,BIN,$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES))))))))
+sinclude $(patsubst %.c,$(DEPDIR)%.d,$(patsubst %.y,$(DEPDIR)%.tab.d,$(patsubst %.l,$(DEPDIR)%.lex.yy.d,$(filter %.c %.y %.l,$(foreach prefix,$(BINARY_PREFIXES),$(foreach primary,PROGRAMS LIBRARIES SOLIBRARIES,$(foreach basename,$($(prefix)_$(primary)),$($(basename)_SOURCES))))))))
 endif
 
 # Defines a canned recipe which prints a note explaining how YACC debugging works
@@ -71,7 +71,7 @@ else
 	$(if $(VERBOSE),$$(if $$(filter %.y,$$($(2)_SOURCES)),$(if $(DEBUG_YACC),$$(MKFWK_RECIPE_PRINT_YACC_DEBUG_NOTE))))
 endif
 endef
-$(foreach prefix,BIN,$(foreach variable,$($(prefix)_PROGRAMS),$(eval $(call mkfwk_rule_for_program,$(prefix),$(variable)))))
+$(foreach prefix,$(BINARY_PREFIXES),$(foreach variable,$($(prefix)_PROGRAMS),$(eval $(call mkfwk_rule_for_program,$(prefix),$(variable)))))
 mkfwk_rule_for_program=
 
 # Defines an explicit rule that (re)makes a shared library and then parses it for each one of them
@@ -100,7 +100,7 @@ else
 	$(if $(VERBOSE),$$(if $$(filter %.y,$$($(2)_SOURCES)),$(if $(DEBUG_YACC),$$(MKFWK_RECIPE_PRINT_YACC_DEBUG_NOTE))))
 endif
 endef
-$(foreach prefix,BIN,$(foreach variable,$($(prefix)_SOLIBRARIES),$(eval $(call mkfwk_rule_for_shared_library,$(prefix),$(variable)))))
+$(foreach prefix,$(BINARY_PREFIXES),$(foreach variable,$($(prefix)_SOLIBRARIES),$(eval $(call mkfwk_rule_for_shared_library,$(prefix),$(variable)))))
 mkfwk_rule_for_shared_library=
 
 # Defines a canned recipe which executes the RANLIB command for updating the symbol table of an archive
@@ -137,7 +137,7 @@ else
 	+$$(if $$(MKFWK_HAVE_COMMAND-RANLIB),$$(RANLIB) -t '$$@' 2>/dev/null || $(TRUE))
 endif
 endef
-$(foreach prefix,BIN,$(foreach variable,$($(prefix)_LIBRARIES),$(eval $(call mkfwk_rule_for_static_library,$(prefix),$(variable)))))
+$(foreach prefix,$(BINARY_PREFIXES),$(foreach variable,$($(prefix)_LIBRARIES),$(eval $(call mkfwk_rule_for_static_library,$(prefix),$(variable)))))
 mkfwk_rule_for_static_library=
 
 # Enables a secondary expansion of the prerequisite list for all the rules that are parsed onwards
@@ -223,6 +223,7 @@ endif
 # Parses a pattern rule that "(re)makes" the makefiles with automatically generated dependencies ($(DEPDIR)*.d files), but actually has an empty recipe which does nothing.
 #   GNU Make thinks the target gets made nonetheless
 $(DEPDIR)%.d: ;
+#%.d: ;
 #    This prevents GNU Make from (re)making any included $(DEPDIR)*.d files that are out of date or don't exist once it has finished reading makefiles
 
 # Defines a pattern rule that (re)makes object files: $(OBJDIR)*.o

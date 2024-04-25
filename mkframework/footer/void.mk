@@ -1,4 +1,4 @@
-# Filename: void.mk / v2024.03.25-001, part of gcc-bison-flex-GNUmakefile
+# Filename: void.mk / v2024.04.25-001, part of gcc-bison-flex-GNUmakefile
 # Makefile which overrides some make's built-ins to enhance performance
 # Copyright (C) 2022-2024 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
 # You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.

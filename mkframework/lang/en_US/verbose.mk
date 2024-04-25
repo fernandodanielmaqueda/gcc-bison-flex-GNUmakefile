@@ -1,4 +1,4 @@
-# Filename: verbose.mk / v2024.03.25-001, part of gcc-bison-flex-GNUmakefile
+# Filename: verbose.mk / v2024.04.25-001, part of gcc-bison-flex-GNUmakefile
 # English (United States) language-specific makefile containing verbose printing messages
 # Copyright (C) 2022-2024 Fernando Daniel Maqueda <https://github.com/fernandodanielmaqueda/>
 # You should have received a copy of the GNU General Public License along with this. If not, see <https://www.gnu.org/licenses/>.
@@ -43,6 +43,7 @@ MKFWK_PRINTF_FORMAT_MSG_THE_YACC_GENERATED_FILE=the YACC-generated file
 MKFWK_PRINTF_FORMAT_MSG_EXCEPTION_PROGRAM_DOES_NOT_EXIST=EXCEPTION: The target program does not exist
 MKFWK_PRINTF_FORMAT_MSG_MUST_BE_BUILT_FIRST=It must be built first
 MKFWK_PRINTF_FORMAT_MSG_RELATIVE_PATH=Relative path
+MKFWK_PRINTF_FORMAT_MSG_ABSOLUTE_PATH=Absolute path
 
 MKFWK_PRINTF_FORMAT_MSG_INIT_TARGET-run=Run the target program in this window
 MKFWK_PRINTF_FORMAT_MSG_DO_TARGET-run=Running the target program
